@@ -1,0 +1,4744 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A gentle introduction to ggplot2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Senior Researcher, NORCE" />
+    <meta name="date" content="2022-10-29" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# A gentle introduction to ggplot2
+]
+.subtitle[
+## Sondre Nilsen, PhD
+]
+.author[
+### Senior Researcher, NORCE
+]
+.date[
+### 2022-10-29
+]
+
+---
+
+
+
+
+&lt;style type="text/css"&gt;
+/* custom.css */
+.left-code {
+  color: #000000;
+  width: 38%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+.plot-callout {
+  height: 225px;
+  width: 470px;
+  bottom: 5%;
+  right: 4%;
+  position: absolute;
+  padding: 0px;
+  z-index: 100;
+}
+.plot-callout img {
+  width: 100%;
+  border: 4px solid #23373B;
+}
+&lt;/style&gt;
+
+&lt;!-- Works with xaringan's default CSS --&gt;
+
+## Main packages needed
+
+The **Tidyverse** is a collection of packages designed for data science. 
+All packages share an underlying design philosophy, grammar, and data structure.  
+**ggplot2** is built within the **Tidyverse** ecosystem.
+
+See &lt;https://www.tidyverse.org&gt;  
+
+
+```r
+library(tidyverse) #install.packages("tidyverse")
+```
+
+---
+
+
+### Data Gapminder
+
+
+
+```r
+library(gapminder) # install.packages("gapminder")
+*df &lt;- gapminder
+```
+
+
+View variable info
+
+```r
+*str(df)
+```
+
+```
+## tibble [1,704 × 6] (S3: tbl_df/tbl/data.frame)
+##  $ country  : Factor w/ 142 levels "Afghanistan",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ continent: Factor w/ 5 levels "Africa","Americas",..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ year     : int [1:1704] 1952 1957 1962 1967 1972 1977 1982 1987 1992 1997 ...
+##  $ lifeExp  : num [1:1704] 28.8 30.3 32 34 36.1 ...
+##  $ pop      : int [1:1704] 8425333 9240934 10267083 11537966 13079460 14880372 12881816 13867957 16317921 22227415 ...
+##  $ gdpPercap: num [1:1704] 779 821 853 836 740 ...
+```
+
+
+---
+
+### Data Gapminder
+
+
+```r
+*head(df)
+```
+
+```
+## # A tibble: 6 × 6
+##   country     continent  year lifeExp      pop gdpPercap
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8  8425333      779.
+## 2 Afghanistan Asia       1957    30.3  9240934      821.
+## 3 Afghanistan Asia       1962    32.0 10267083      853.
+## 4 Afghanistan Asia       1967    34.0 11537966      836.
+## 5 Afghanistan Asia       1972    36.1 13079460      740.
+## 6 Afghanistan Asia       1977    38.4 14880372      786.
+```
+
+
+```r
+*table(df$continent, df$year)
+```
+
+```
+##           
+##            1952 1957 1962 1967 1972 1977 1982 1987 1992 1997 2002 2007
+##   Africa     52   52   52   52   52   52   52   52   52   52   52   52
+##   Americas   25   25   25   25   25   25   25   25   25   25   25   25
+##   Asia       33   33   33   33   33   33   33   33   33   33   33   33
+##   Europe     30   30   30   30   30   30   30   30   30   30   30   30
+##   Oceania     2    2    2    2    2    2    2    2    2    2    2    2
+```
+
+
+
+---
+
+
+&lt;!-- Uses custom CSS for wider plot area --&gt;
+
+
+.left-code[
+### Mapping (aesthetics) 
+
+```r
+df %&gt;% #Sondre: Explain pipe
+* ggplot(aes(x = continent,
+*            y = lifeExp))
+```
+
+
+Lets explore  life expectancy (**lifeExp**) across **continents**.
+
+With dataframe **df**, map variable **continent** to the x-axis,
+variable **lifeExp** to y-axis. **ggplot()** is the function that tells R that we want to use the ggplot2 package.
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label1-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Geometries (geoms)
+
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent,
+             y = lifeExp)) + 
+* geom_point()
+```
+
+**geoms** are needed to visually represent data. 
+The most simple geom is the **geom_point()**. 
+All geoms are prefaced by the code **geom_**
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label2-out-1.png" width="100%" /&gt;
+]
+
+---
+
+### Common geoms
+
+.font80[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Jitter | `geom_jitter()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+See &lt;http://ggplot2.tidyverse.org/reference/&gt;  
+Type `geom_` in RStudio
+]
+
+---
+### But there are a lot more to pick from...
+
+
+```
+##  [1] "geom_abline"            "geom_area"              "geom_bar"              
+##  [4] "geom_bin_2d"            "geom_bin2d"             "geom_blank"            
+##  [7] "geom_boxplot"           "geom_col"               "geom_contour"          
+## [10] "geom_contour_filled"    "geom_count"             "geom_crossbar"         
+## [13] "geom_curve"             "geom_density"           "geom_density_2d"       
+## [16] "geom_density_2d_filled" "geom_density2d"         "geom_density2d_filled" 
+## [19] "geom_dotplot"           "geom_errorbar"          "geom_errorbarh"        
+## [22] "geom_freqpoly"          "geom_function"          "geom_hex"              
+## [25] "geom_histogram"         "geom_hline"             "geom_jitter"           
+## [28] "geom_label"             "geom_line"              "geom_linerange"        
+## [31] "geom_map"               "geom_path"              "geom_point"            
+## [34] "geom_pointrange"        "geom_polygon"           "geom_qq"               
+## [37] "geom_qq_line"           "geom_quantile"          "geom_raster"           
+## [40] "geom_rect"              "geom_ribbon"            "geom_rug"              
+## [43] "geom_segment"           "geom_sf"                "geom_sf_label"         
+## [46] "geom_sf_text"           "geom_smooth"            "geom_spoke"            
+## [49] "geom_step"              "geom_text"              "geom_tile"             
+## [52] "geom_violin"            "geom_vline"
+```
+
+
+
+
+
+---
+
+.left-code[
+### Geom point
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent,
+             y = lifeExp)) +
+* geom_point()
+```
+
+As continent is a factor variable, 
+**geom_point** may not be the best option.
+Lets try another geom...
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label3-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+### Geom jitter
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+* geom_jitter()
+```
+
+**Jitter** adds spread to data points to avoid overlap.
+Better when x is not a true ratio variable
+
+]
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label4-out-1.png" width="100%" /&gt;
+]
+---
+
+
+.left-code[
+### Using scales
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+* geom_jitter(aes(
+*   colour = continent))
+```
+
+Scales are used to map visual properties to geoms. 
+The most common scales are  **group**, **colour**, and  **size**
+ **colour** scale adds colour by properties of another variable. 
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label6-out-1.png" width="100%" /&gt;
+]
+
+
+
+---
+.left-code[
+### Global options of geoms
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+  geom_jitter(aes(
+    colour = continent), 
+*   size = 0.8,
+*   alpha = 0.3)
+```
+
+
+General properties of the the geoms are defined outside the **aes** parenthesis.
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label7-out-1.png" width="100%" /&gt;
+]
+
+
+
+
+---
+
+.left-code[
+### Add layers of graphics
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+  geom_jitter(aes(
+    colour = continent),
+    size = 1, 
+    alpha = 0.3) +
+* geom_boxplot()
+```
+
+ggplot2 is an empty "canvas" we can add more and more layers to. 
+As we are comparing groups, adding a boxplot would perhaps be nice...?
+As geom_boxplot comes after geom_jitter, it is added "on top". 
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label8-out-1.png" width="100%" /&gt;
+]
+
+---
+.left-code[
+### Order matters
+
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+* geom_boxplot() +
+  geom_jitter(aes(
+    colour = continent),
+    size = 1, 
+    alpha = 0.3)
+```
+
+Now the geom_jitter comes after the geom_boxplot
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label9-out-1.png" width="100%" /&gt;
+]
+
+
+---
+.left-code[
+### Adding some colour to the boxplot
+
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+* geom_boxplot(aes(
+*   fill = continent)) +
+  geom_jitter(aes(
+    colour = continent),
+    size = 1, 
+    alpha = 0.3)
+```
+
+To add colour to the boxplot, we use the **fill scale**
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label10-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Order matters: but is more always better?
+
+
+```r
+df %&gt;% 
+  ggplot(aes(x = continent, 
+             y = lifeExp)) +
+* geom_violin(aes(
+*   fill = continent)) +
+  geom_boxplot(aes( 
+    fill = continent)) + 
+  geom_jitter(aes(
+    colour = continent),
+    size = 1, 
+    alpha = 0.3)
+```
+
+the **geom_violin()** adds a violing plot
+As we placed the code before geom_box and geom_jitter
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label11-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Lets try to tidy it up
+
+
+```r
+df %&gt;% 
+  ggplot(aes(
+    x = continent, 
+    y = lifeExp)) +
+  geom_violin(aes(
+    fill = continent)) +
+  geom_boxplot(aes(
+    fill = continent),
+*   width = 0.2)
+```
+With a geom_violin and geom_boxplot, the jitter is perhaps not needed.
+**width** command in the geom_boxplot reduced the size of the boxplot so it fits within the geom_violin
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label12-out-1.png" width="100%" /&gt;
+]
+
+---
+.left-code[
+###Axis labels
+
+
+```r
+df %&gt;% 
+  ggplot(aes(
+    x = continent, 
+    y = lifeExp)) +
+  geom_violin(aes(
+    fill = continent)) +
+  geom_boxplot(aes(
+    fill = continent),
+    width = 0.2) +
+* ylab("Life expectancy") +
+* xlab("")
+```
+**ylab** and **xlab** adds axis-lables. As the x-axis is rather self explanatory, we can reomve it if we want **("")**
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label13-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Themes
+
+```r
+df %&gt;% 
+  ggplot(aes(
+    x = continent, 
+    y = lifeExp)) +
+  geom_violin(aes(
+    fill = continent)) +
+  geom_boxplot(aes(
+    fill = continent),
+    width = 0.2) +
+  ylab("Life expectancy") +
+  xlab("") + 
+* theme_bw() +
+* theme(legend.position = "none")
+```
+We have almost full power of the aesthetic outlook of the plot. 
+A lot of pre-defined themes exist within ggplot2. 
+Write **theme_** to see options. 
+**theme_bw()** is a good place to start.
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label14-out-1.png" width="100%" /&gt;
+]
+
+
+
+---
+
+.left-code[
+### Themes: Full control
+
+```r
+df %&gt;% 
+  ggplot(aes(
+    x = continent, 
+    y = lifeExp)) +
+  geom_violin(aes(
+    fill = continent)) +
+  geom_boxplot(aes(
+    fill = continent),
+    width = 0.2) +
+  ylab("Life expectancy") + 
+  xlab("") + 
+  theme_bw(base_size = 16) +
+*theme(
+* legend.position = "none",
+* panel.grid = element_blank())
+```
+**theme()**; we can change anything we want. 
+Lets remove **grid lines** in the plot,  place the legend at the bottom and remove the legend title...
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label15-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### How simple
+
+```r
+df %&gt;% 
+  ggplot(aes(
+    x = continent, 
+    y = lifeExp,
+*   fill = continent)) +
+  geom_violin() +
+  geom_boxplot(
+    width = 0.2) +
+  ylab("Life expectancy") + 
+  xlab("") + 
+  theme_bw(base_size = 16) +
+theme(
+  legend.position = "none",
+  panel.grid = element_blank()) 
+```
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label16-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+.left-code[
+### Looking at part of the data
+
+```r
+*df %&gt;%
+* filter(
+*   continent == "Americas")
+```
+Sometimes we only want to plot a subset of our data. 
+In R, we can  subset our data with a few lines of code
+]
+
+
+.right-plot[
+
+```
+## # A tibble: 300 × 6
+##    country   continent  year lifeExp      pop gdpPercap
+##    &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+##  1 Argentina Americas   1952    62.5 17876956     5911.
+##  2 Argentina Americas   1957    64.4 19610538     6857.
+##  3 Argentina Americas   1962    65.1 21283783     7133.
+##  4 Argentina Americas   1967    65.6 22934225     8053.
+##  5 Argentina Americas   1972    67.1 24779799     9443.
+##  6 Argentina Americas   1977    68.5 26983828    10079.
+##  7 Argentina Americas   1982    69.9 29341374     8998.
+##  8 Argentina Americas   1987    70.8 31620918     9140.
+##  9 Argentina Americas   1992    71.9 33958947     9308.
+## 10 Argentina Americas   1997    73.3 36203463    10967.
+## # … with 290 more rows
+## # ℹ Use `print(n = ...)` to see more rows
+```
+]
+
+
+---
+.left-code[
+### Looking at part of the data
+
+```r
+df %&gt;% 
+  filter(
+    continent == "Americas") %&gt;% 
+* ggplot(aes(
+*   x = lifeExp,
+*   y =country))
+```
+We can then feed the subset of the data into ggplot.
+When looking at categorical data with many levels, 
+putting the categorical variable on the "y-axis" is a neat trick
+
+]
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label18-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Looking at part of the data: Density gradient
+
+```r
+*library(ggridges)
+
+df %&gt;% 
+  filter(
+    continent == c("Americas")) %&gt;% 
+  ggplot(aes(
+    x = lifeExp, 
+    y =country)) +
+* geom_density_ridges()
+```
+There exists several extensions to ggplot2 that provides additional **geoms_** and functions. 
+The "ggridges" is one of the more popular ones that provides additional functionality to the "geom_density" geom already present in ggplot2. 
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label19-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+.left-code[
+### Looking at part of the data: Density gradient
+
+```r
+df %&gt;% 
+  filter(
+    continent == ("Americas")) %&gt;% 
+  ggplot(aes(
+    x = lifeExp, 
+    y =country,
+*   fill = stat(x)))  +
+* geom_density_ridges_gradient()
+```
+One neat feature is that we can add a gradient colour scale to the figure by using the
+**geom_density_ridges_gradient** geom from **ggrepel**
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label20-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Looking at part of the data: Density gradient
+
+```r
+df %&gt;% 
+  filter(
+    continent == "Americas") %&gt;% 
+  ggplot(aes(
+    x = lifeExp, 
+    y =country,
+    fill = stat(x))) +
+  geom_density_ridges_gradient() +  
+* scale_fill_viridis_c(
+*   name = "Life expectancy",
+*   option = "C")
+```
+
+]
+
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label21-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+### Looking at part of the data: Density gradient
+
+```r
+df %&gt;% 
+  filter(
+    continent == "Americas") %&gt;% 
+  ggplot(aes(
+    x = lifeExp, 
+    y =country,
+    fill = stat(x))) +
+  geom_density_ridges_gradient() +  
+  scale_fill_viridis_c( 
+    name = "Life expectancy", 
+    option = "C") + 
+* xlab("Life expectancy (years)") +
+* ylab("") +
+* theme_bw() +
+* theme(
+*   legend.position = "bottom",
+*   legend.title = element_blank()
+* )
+```
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label22-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+.left-code[
+### Looking at part of the data: Reorder
+
+```r
+df %&gt;% 
+  filter(
+    continent == "Americas") %&gt;% 
+  ggplot(aes(
+    x = lifeExp, 
+*   y = reorder(country,lifeExp),
+    fill = stat(x))) +
+  geom_density_ridges_gradient() +  
+  scale_fill_viridis_c( 
+    name = "Life expectancy", 
+    option = "C") + 
+  xlab("Life expectancy (years)") +
+  ylab("") +
+  theme_bw() + 
+  theme( 
+    legend.position = "bottom", 
+    legend.title = element_blank())
+```
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label23-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### Looking at part of the data: Median
+
+```r
+library(ggridges) 
+
+df %&gt;% 
+  filter(
+    continent == "Americas") %&gt;% 
+* mutate(med = median(lifeExp)) %&gt;%
+  ggplot(aes(
+    x = lifeExp, 
+    y = reorder(country,lifeExp), 
+    fill = stat(x))) +
+  geom_density_ridges_gradient() +  
+  scale_fill_viridis_c( 
+    name = "Life expectancy", 
+    option = "C") + 
+  xlab("Life expectancy (years)") +
+  ylab("") +
+  theme_bw() + 
+  theme( 
+    legend.position = "bottom", 
+    legend.title = element_blank()) +
+* geom_vline(aes(xintercept = med),
+*   linetype = "dashed",
+*   size = 0.8)
+```
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label24-out-1.png" width="100%" /&gt;
+]
+
+
+
+
+---
+
+.left-code[
+### Looking at part of the data: Facets
+
+```r
+df %&gt;% 
+* filter(
+*   country %in% c(
+*     "Norway",
+*     "Sweden",
+*     "Finland",
+*     "Denmark")) %&gt;%
+  knitr::kable(format = "html")
+```
+The filter function can also take a vector of conditions
+by using the **%in%** function
+
+]
+
+.right-plot[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdpPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4334000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9692.385 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.810 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4487831 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11099.659 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.350 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4646899 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13583.314 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.960 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4838800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15937.211 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.470 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4991596 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18866.207 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.690 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5088419 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20422.901 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.630 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5117810 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21688.040 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5127024 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25116.176 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.330 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5171393 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26406.740 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.110 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5283663 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29804.346 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5374693 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32166.500 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.332 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5468120 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35278.419 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.550 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4090500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6424.519 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.490 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4324000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7545.415 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.750 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4491443 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9371.843 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.830 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4605744 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10921.636 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.870 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4639657 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14358.876 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.520 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4738902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15605.423 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.550 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4826933 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18533.158 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.830 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4931729 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21141.012 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.700 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5041039 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20647.165 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.130 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5134406 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23723.950 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.370 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5193039 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28204.591 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Finland &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.313 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5238460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33207.084 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.670 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3327728 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10095.422 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3491938 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11653.973 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.470 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3638919 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13450.402 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.080 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3786019 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16361.876 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3933004 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18965.056 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.370 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4043205 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23311.349 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4114787 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26298.635 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.890 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4186147 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31540.975 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4286357 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33965.661 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4405672 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41283.164 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.050 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4535591 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44683.975 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Norway &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.196 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4627926 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49357.190 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.860 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7124673 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8527.845 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.490 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7363802 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9911.878 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.370 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7561588 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12329.442 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7867931 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15258.297 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.720 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8122293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17832.025 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8251648 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18855.725 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.420 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8325260 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20667.381 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8421403 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23586.929 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8718867 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23880.017 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.390 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8897619 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25266.595 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.040 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8954175 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29341.631 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sweden &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.884 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9031088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33859.748 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+---
+
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c( 
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+*   ggplot(aes(
+*   x = year,
+*   y = lifeExp)) +
+*  facet_wrap(~country)
+```
+**facet_wrap**  splits the visualization by a factor variable.   
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label26-out-1.png" width="100%" /&gt;
+
+]
+
+
+---
+
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c(
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+  ggplot(aes(
+    x = year, 
+    y = lifeExp)) + 
+   facet_wrap(~country) +
+* geom_point()
+```
+
+The added geoms will respect the facet
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label27-out-1.png" width="100%" /&gt;
+
+]
+
+
+---
+
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c(
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+  ggplot(aes(
+    x = year, 
+    y = lifeExp)) + 
+   facet_wrap(~country) +
+  geom_point() +
+* geom_line()
+```
+
+To draw a line graph, we simply use the **geom_line**.
+The relationship looks fairly linear in all countries
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label28-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c(
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+  ggplot(aes(
+    x = year, 
+    y = lifeExp)) + 
+   facet_wrap(~country) +
+  geom_point() +
+  geom_line() +
+* geom_smooth(method = "lm")
+```
+
+ggplot2 also has built in functions to draw lines of best fit based on statistical models using 
+the **geom_smooth()** and specifying **method = "lm"**
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label29-out-1.png" width="100%" /&gt;
+]
+
+---
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c(
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+  ggplot(aes(
+    x = year, 
+    y = lifeExp)) + 
+   facet_wrap(~country) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+* geom_smooth(method = "lm",
+*              formula =
+*               y ~ poly(x, 3),
+*             colour="red")
+```
+
+**geom_smooth** can fit various polynomials as well. 
+Here we have added a cubic polynomial as well (in red)
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label30-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+
+.left-code[
+### Facets: Life expectancy in the Nordic countries
+
+```r
+df %&gt;% 
+  filter(
+    country %in% c(
+      "Norway",
+      "Sweden",
+      "Finland",
+      "Denmark")) %&gt;% 
+  ggplot(aes(
+    x = year, 
+    y = lifeExp)) + 
+   facet_wrap(~country) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+* theme_light() +
+* xlab("") +
+* ylab("Life expectancy")
+```
+
+Linear function is a parsimonius model. 
+By a few few tweaks, we have a fairly pretty figure
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label31-out-1.png" width="100%" /&gt;
+]
+
+---
+.left-code[
+### Facets: Blistering fast
+
+```r
+df %&gt;% 
+  filter(!continent %in%
+           c("Oceania")) %&gt;% 
+  ggplot(aes(
+    x = year,
+    y = lifeExp,
+    group = country)) +
+  geom_smooth(se = FALSE,
+              colour = "darkblue",
+              size = 0.5)+
+  facet_wrap(~ continent) +
+  theme_bw() 
+```
+Behind the scenes: ggplot calculates a GAM-curve for each country
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label32-out-1.png" width="100%" /&gt;
+]
+
+---
+
+### Longitudinal multilevel analysis: Depression over time
+
+
+```r
+head(df_dep) 
+```
+
+```
+##   id fc1 nle4 time  dep anx  hos fc1dik
+## 1  1 2.5   NA    0 1.25 1.0 1.17      1
+## 2  1 2.5   NA    1   NA  NA   NA      1
+## 3  1 2.5   NA    3   NA  NA   NA      1
+## 4  1 2.5   NA    4 1.17 1.0 1.17      1
+## 5  2 3.0    5    0 1.33 1.0 1.17      1
+## 6  2 3.0    5    1 1.50 1.4 1.17      1
+```
+
+
+
+From the book Higher-Order Growth Curves and Mixture Modeling with Mplus (Kandauda K.A.S. Wickrama, Tae Kyoung Lee, et al)
+
+The longitudinal data set contains self-reported measures of depression (dep), anxiety (anx) and hostility (hos) from 451 young people across four time points (1,2,3,4).
+
+
+Contains two potential predictors:
+1. Financial setbacks at time 1 (fc1 and fc1dik)
+2. Negative life events at time 4 (nle4
+
+
+---
+
+.left-code[
+### Scatter plot of time and depression
+
+```r
+*df_dep %&gt;%
+* ggplot(aes(
+*   x = time, y = dep)) +
+* geom_point()
+```
+Each dot is a unique individual at each time point
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label33-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+### I just want to draw the trend..
+
+```r
+df_dep %&gt;% 
+  ggplot(aes(
+    x = time, y = dep)) +
+  geom_point() +
+* geom_line()
+```
+As we have multiple observations per time unit, 
+ggplot does as told: connect the dots...
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label34-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+### I just want to draw the trend..
+
+```r
+df_dep %&gt;% 
+  ggplot(aes(
+    x = time, y = dep)) +
+  geom_point() +
+* geom_line(aes(group = id),
+*           alpha = 0.4)
+```
+by mapping **id** to **group** within **geom_line**,
+we get the observed trend for each individual
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label35-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+### I just want to draw the trend...
+
+```r
+df_dep %&gt;% 
+  ggplot(aes(
+    x = time,
+    y = dep)) +
+  geom_point() +
+  geom_line(aes(group = id,
+*               colour = fc1dik),
+            alpha = 0.2)
+```
+We can also map **fc1dik** to colour to illustrate the lines for the two groups. 
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label36-out-1.png" width="100%" /&gt;
+]
+
+
+
+---
+
+.left-code[
+### I just want to draw the trend...
+
+```r
+df_dep %&gt;% 
+  ggplot(aes(
+    x = time,
+    y = dep)) +
+  geom_point() +
+* geom_line(aes(group = id),
+*           alpha = 0.2) +
+* geom_smooth(method = "loess",
+*             aes(colour = fc1dik))
+```
+The **geom_smooth(method = "loess")** fits a gam curve to data.  
+By mapping **fc1dik** to **colour** we get seperate trends by groups
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label37-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+
+.left-code[
+### Ok - but i just want the means...
+
+```r
+df_dep %&gt;% 
+*group_by(time, fc1dik) %&gt;%
+* mutate(dep_mean =
+*   mean(dep,
+*        na.rm = TRUE)) %&gt;%
+  knitr::kable(style = "html")
+```
+
+We can caclculate the means and feed it to ggplot.    
+**dep_mean** is the mean score of **dep** across individuals at time *i*
+
+
+]
+
+.right-plot[
+
+|id  | fc1| nle4| time|  dep| anx|  hos|fc1dik | dep_mean|
+|:---|---:|----:|----:|----:|---:|----:|:------|--------:|
+|1   | 2.5|   NA|    0| 1.25| 1.0| 1.17|1      | 1.688553|
+|1   | 2.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|1   | 2.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|1   | 2.5|   NA|    4| 1.17| 1.0| 1.17|1      | 1.532414|
+|2   | 3.0|    5|    0| 1.33| 1.0| 1.17|1      | 1.688553|
+|2   | 3.0|    5|    1| 1.50| 1.4| 1.17|1      | 1.574516|
+|2   | 3.0|    5|    3| 1.50| 1.1| 1.17|1      | 1.617393|
+|2   | 3.0|    5|    4| 1.42| 1.1| 1.17|1      | 1.532414|
+|3   | 3.0|    3|    0| 1.92| 1.3| 1.67|1      | 1.688553|
+|3   | 3.0|    3|    1| 1.75| 1.2| 1.33|1      | 1.574516|
+|3   | 3.0|    3|    3| 1.50| 1.0| 1.00|1      | 1.617393|
+|3   | 3.0|    3|    4| 2.58| 1.1| 1.33|1      | 1.532414|
+|4   | 2.5|    1|    0| 1.83| 1.4| 1.17|1      | 1.688553|
+|4   | 2.5|    1|    1| 1.42| 1.5| 1.17|1      | 1.574516|
+|4   | 2.5|    1|    3| 1.50| 1.5| 1.17|1      | 1.617393|
+|4   | 2.5|    1|    4| 1.25| 1.3| 1.17|1      | 1.532414|
+|5   | 3.0|    2|    0| 1.17| 1.1| 1.00|1      | 1.688553|
+|5   | 3.0|    2|    1| 1.50| 1.2| 1.33|1      | 1.574516|
+|5   | 3.0|    2|    3| 1.58| 1.5| 1.17|1      | 1.617393|
+|5   | 3.0|    2|    4| 1.42| 1.3| 1.33|1      | 1.532414|
+|6   | 2.5|    1|    0| 1.83| 1.2| 1.50|1      | 1.688553|
+|6   | 2.5|    1|    1| 1.67| 1.2| 1.00|1      | 1.574516|
+|6   | 2.5|    1|    3|   NA|  NA|   NA|1      | 1.617393|
+|6   | 2.5|    1|    4|   NA|  NA|   NA|1      | 1.532414|
+|7   | 2.5|    1|    0| 1.83| 1.2| 1.83|1      | 1.688553|
+|7   | 2.5|    1|    1| 2.50| 1.3| 1.83|1      | 1.574516|
+|7   | 2.5|    1|    3| 1.83| 1.5| 1.83|1      | 1.617393|
+|7   | 2.5|    1|    4| 1.67| 1.1| 1.33|1      | 1.532414|
+|8   | 3.0|    3|    0| 1.67| 1.3| 1.17|1      | 1.688553|
+|8   | 3.0|    3|    1| 1.42| 1.1| 1.33|1      | 1.574516|
+|8   | 3.0|    3|    3| 1.58| 1.0| 1.17|1      | 1.617393|
+|8   | 3.0|    3|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|9   | 2.0|    1|    0| 2.25| 2.1| 2.17|0      | 1.482556|
+|9   | 2.0|    1|    1| 1.25| 1.5| 1.50|0      | 1.359807|
+|9   | 2.0|    1|    3|   NA|  NA|   NA|0      | 1.325204|
+|9   | 2.0|    1|    4|   NA|  NA|   NA|0      | 1.365102|
+|10  | 2.0|    2|    0| 1.83| 1.5| 1.33|0      | 1.482556|
+|10  | 2.0|    2|    1| 1.42| 1.2| 1.00|0      | 1.359807|
+|10  | 2.0|    2|    3| 1.50| 1.0| 1.33|0      | 1.325204|
+|10  | 2.0|    2|    4| 1.50| 1.2| 1.17|0      | 1.365102|
+|11  | 2.5|    4|    0| 2.17| 1.3| 2.00|1      | 1.688553|
+|11  | 2.5|    4|    1| 1.58| 1.4| 2.00|1      | 1.574516|
+|11  | 2.5|    4|    3| 1.50| 1.3| 1.17|1      | 1.617393|
+|11  | 2.5|    4|    4| 1.58| 1.6| 1.83|1      | 1.532414|
+|12  | 2.0|    2|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|12  | 2.0|    2|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|12  | 2.0|    2|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|12  | 2.0|    2|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|13  | 1.0|    4|    0| 1.00| 1.0| 1.00|0      | 1.482556|
+|13  | 1.0|    4|    1| 1.17| 1.0| 1.00|0      | 1.359807|
+|13  | 1.0|    4|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|13  | 1.0|    4|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|14  | 1.0|   NA|    0| 1.42| 1.1| 1.33|0      | 1.482556|
+|14  | 1.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|14  | 1.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|14  | 1.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|15  | 1.5|    0|    0| 1.33| 1.4| 1.50|0      | 1.482556|
+|15  | 1.5|    0|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|15  | 1.5|    0|    3| 1.17| 1.0| 1.33|0      | 1.325204|
+|15  | 1.5|    0|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|16  | 2.0|    0|    0| 1.17| 1.3| 1.00|0      | 1.482556|
+|16  | 2.0|    0|    1| 1.25| 1.2| 1.17|0      | 1.359807|
+|16  | 2.0|    0|    3| 1.25| 1.2| 1.17|0      | 1.325204|
+|16  | 2.0|    0|    4| 1.17| 1.1| 1.00|0      | 1.365102|
+|17  | 2.0|    3|    0| 1.50| 1.0| 1.17|0      | 1.482556|
+|17  | 2.0|    3|    1| 1.42| 1.0| 1.33|0      | 1.359807|
+|17  | 2.0|    3|    3| 1.50| 1.4| 1.50|0      | 1.325204|
+|17  | 2.0|    3|    4| 1.25| 1.0| 1.33|0      | 1.365102|
+|18  | 2.0|    2|    0| 1.00| 1.0| 1.00|0      | 1.482556|
+|18  | 2.0|    2|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|18  | 2.0|    2|    3| 1.08| 1.1| 1.00|0      | 1.325204|
+|18  | 2.0|    2|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|19  | 2.5|    1|    0| 1.33| 1.3| 1.33|1      | 1.688553|
+|19  | 2.5|    1|    1| 1.08| 1.1| 1.00|1      | 1.574516|
+|19  | 2.5|    1|    3| 1.17| 1.3| 1.17|1      | 1.617393|
+|19  | 2.5|    1|    4| 1.00| 1.1| 1.17|1      | 1.532414|
+|20  | 2.0|    2|    0| 2.33| 1.6| 2.00|0      | 1.482556|
+|20  | 2.0|    2|    1| 1.67| 1.6| 1.33|0      | 1.359807|
+|20  | 2.0|    2|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|20  | 2.0|    2|    4| 1.25| 1.2| 1.00|0      | 1.365102|
+|21  | 1.0|    4|    0| 1.42| 1.0| 1.17|0      | 1.482556|
+|21  | 1.0|    4|    1| 1.33| 1.0| 1.00|0      | 1.359807|
+|21  | 1.0|    4|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|21  | 1.0|    4|    4| 1.25| 1.2| 1.17|0      | 1.365102|
+|22  | 2.0|    2|    0| 1.83| 1.6| 1.17|0      | 1.482556|
+|22  | 2.0|    2|    1| 1.67| 1.3| 1.00|0      | 1.359807|
+|22  | 2.0|    2|    3| 1.50| 1.4| 1.33|0      | 1.325204|
+|22  | 2.0|    2|    4| 1.83| 1.1| 1.17|0      | 1.365102|
+|23  | 1.0|    0|    0| 1.00| 1.0| 1.00|0      | 1.482556|
+|23  | 1.0|    0|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|23  | 1.0|    0|    3| 1.33| 1.0| 1.00|0      | 1.325204|
+|23  | 1.0|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|24  | 2.5|    2|    0| 1.08| 1.0| 1.00|1      | 1.688553|
+|24  | 2.5|    2|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|24  | 2.5|    2|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|24  | 2.5|    2|    4| 1.08| 1.1| 1.17|1      | 1.532414|
+|25  | 5.0|    2|    0| 2.00| 1.6| 1.83|1      | 1.688553|
+|25  | 5.0|    2|    1| 2.75| 3.1| 3.17|1      | 1.574516|
+|25  | 5.0|    2|    3| 4.08| 4.2| 2.83|1      | 1.617393|
+|25  | 5.0|    2|    4| 3.50| 2.9| 2.50|1      | 1.532414|
+|26  | 4.0|    2|    0| 1.83| 1.6| 1.50|1      | 1.688553|
+|26  | 4.0|    2|    1| 1.75| 2.0| 1.67|1      | 1.574516|
+|26  | 4.0|    2|    3| 1.58| 1.5| 1.50|1      | 1.617393|
+|26  | 4.0|    2|    4| 2.92| 1.6| 2.00|1      | 1.532414|
+|27  | 3.5|    2|    0| 1.33| 1.1| 1.17|1      | 1.688553|
+|27  | 3.5|    2|    1| 2.67| 1.6| 1.67|1      | 1.574516|
+|27  | 3.5|    2|    3| 1.08| 1.1| 1.17|1      | 1.617393|
+|27  | 3.5|    2|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|28  | 3.5|    6|    0| 1.92| 1.4| 1.50|1      | 1.688553|
+|28  | 3.5|    6|    1| 1.25| 1.2| 1.00|1      | 1.574516|
+|28  | 3.5|    6|    3| 1.42| 1.3| 1.50|1      | 1.617393|
+|28  | 3.5|    6|    4| 1.42| 1.1| 1.50|1      | 1.532414|
+|29  | 2.0|   NA|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|29  | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|29  | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|29  | 2.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|30  | 2.0|    1|    0| 1.00| 1.1| 1.00|0      | 1.482556|
+|30  | 2.0|    1|    1| 1.00| 1.3| 1.00|0      | 1.359807|
+|30  | 2.0|    1|    3| 1.50| 1.0| 1.33|0      | 1.325204|
+|30  | 2.0|    1|    4| 1.25| 1.1| 1.33|0      | 1.365102|
+|31  | 4.5|    2|    0| 1.50| 1.1| 1.17|1      | 1.688553|
+|31  | 4.5|    2|    1| 1.42| 1.4| 1.50|1      | 1.574516|
+|31  | 4.5|    2|    3| 1.25| 1.6| 1.67|1      | 1.617393|
+|31  | 4.5|    2|    4| 3.67| 2.8| 2.83|1      | 1.532414|
+|32  | 3.0|    1|    0| 1.67| 1.0| 1.17|1      | 1.688553|
+|32  | 3.0|    1|    1| 1.50| 1.3| 1.17|1      | 1.574516|
+|32  | 3.0|    1|    3| 1.50| 1.5| 1.17|1      | 1.617393|
+|32  | 3.0|    1|    4| 1.25| 1.0| 1.17|1      | 1.532414|
+|33  | 2.5|    0|    0| 1.25| 1.1| 1.33|1      | 1.688553|
+|33  | 2.5|    0|    1| 1.08| 1.1| 1.33|1      | 1.574516|
+|33  | 2.5|    0|    3| 1.25| 1.4| 1.33|1      | 1.617393|
+|33  | 2.5|    0|    4| 1.08| 1.2| 1.50|1      | 1.532414|
+|34  | 3.0|    1|    0| 1.67| 1.4| 1.17|1      | 1.688553|
+|34  | 3.0|    1|    1| 1.58| 1.0| 1.17|1      | 1.574516|
+|34  | 3.0|    1|    3| 1.42| 1.3| 1.00|1      | 1.617393|
+|34  | 3.0|    1|    4|   NA|  NA|   NA|1      | 1.532414|
+|35  | 3.0|    0|    0| 2.58| 1.4| 1.67|1      | 1.688553|
+|35  | 3.0|    0|    1| 2.00| 2.9| 1.50|1      | 1.574516|
+|35  | 3.0|    0|    3| 2.08| 1.9| 1.50|1      | 1.617393|
+|35  | 3.0|    0|    4|   NA|  NA|   NA|1      | 1.532414|
+|36  | 4.0|    2|    0| 2.25| 1.2| 2.17|1      | 1.688553|
+|36  | 4.0|    2|    1| 1.33| 1.0| 1.00|1      | 1.574516|
+|36  | 4.0|    2|    3| 1.50| 1.1| 1.00|1      | 1.617393|
+|36  | 4.0|    2|    4| 1.25| 1.0| 1.17|1      | 1.532414|
+|37  | 2.5|    3|    0| 1.42| 1.2| 1.83|1      | 1.688553|
+|37  | 2.5|    3|    1| 1.25| 1.1| 1.50|1      | 1.574516|
+|37  | 2.5|    3|    3| 1.17| 1.1| 1.17|1      | 1.617393|
+|37  | 2.5|    3|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|38  | 1.0|    2|    0| 1.08| 1.1| 1.00|0      | 1.482556|
+|38  | 1.0|    2|    1| 1.08| 1.1| 1.00|0      | 1.359807|
+|38  | 1.0|    2|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|38  | 1.0|    2|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|39  | 1.5|    2|    0| 1.50| 1.0| 1.67|0      | 1.482556|
+|39  | 1.5|    2|    1| 1.42| 1.1| 1.33|0      | 1.359807|
+|39  | 1.5|    2|    3| 2.08| 1.5| 1.67|0      | 1.325204|
+|39  | 1.5|    2|    4| 1.75| 1.4| 1.50|0      | 1.365102|
+|40  | 1.0|    3|    0| 1.33| 1.1| 1.33|0      | 1.482556|
+|40  | 1.0|    3|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|40  | 1.0|    3|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|40  | 1.0|    3|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|41  | 2.0|    3|    0| 2.58| 2.1| 1.67|0      | 1.482556|
+|41  | 2.0|    3|    1| 1.67| 1.2| 1.17|0      | 1.359807|
+|41  | 2.0|    3|    3| 1.92| 1.5| 1.33|0      | 1.325204|
+|41  | 2.0|    3|    4|   NA|  NA|   NA|0      | 1.365102|
+|42  | 2.0|    1|    0| 1.67| 1.3| 1.17|0      | 1.482556|
+|42  | 2.0|    1|    1| 1.67| 1.2| 1.17|0      | 1.359807|
+|42  | 2.0|    1|    3| 1.17| 1.2| 1.00|0      | 1.325204|
+|42  | 2.0|    1|    4| 1.33| 1.1| 1.17|0      | 1.365102|
+|43  | 3.0|    0|    0| 1.50| 1.6| 1.17|1      | 1.688553|
+|43  | 3.0|    0|    1| 1.58| 1.1| 1.17|1      | 1.574516|
+|43  | 3.0|    0|    3| 1.92| 1.8| 1.33|1      | 1.617393|
+|43  | 3.0|    0|    4| 1.42| 1.6| 1.17|1      | 1.532414|
+|44  | 1.0|    0|    0| 1.33| 1.1| 1.17|0      | 1.482556|
+|44  | 1.0|    0|    1| 1.25| 1.0| 1.17|0      | 1.359807|
+|44  | 1.0|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|44  | 1.0|    0|    4| 1.42| 1.2| 1.17|0      | 1.365102|
+|45  | 1.5|    4|    0| 2.00| 1.4| 1.00|0      | 1.482556|
+|45  | 1.5|    4|    1| 1.42| 1.1| 1.17|0      | 1.359807|
+|45  | 1.5|    4|    3| 1.25| 1.0| 1.17|0      | 1.325204|
+|45  | 1.5|    4|    4| 1.67| 1.0| 1.17|0      | 1.365102|
+|46  | 2.5|    3|    0| 2.83| 1.7| 2.33|1      | 1.688553|
+|46  | 2.5|    3|    1| 1.00| 1.1| 1.83|1      | 1.574516|
+|46  | 2.5|    3|    3| 1.42| 1.3| 2.33|1      | 1.617393|
+|46  | 2.5|    3|    4| 1.50| 1.5| 1.17|1      | 1.532414|
+|47  | 3.5|    2|    0| 1.50| 1.1| 1.17|1      | 1.688553|
+|47  | 3.5|    2|    1| 1.75| 1.3| 1.50|1      | 1.574516|
+|47  | 3.5|    2|    3| 2.67| 1.9| 1.67|1      | 1.617393|
+|47  | 3.5|    2|    4|   NA|  NA|   NA|1      | 1.532414|
+|48  | 1.0|    3|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|48  | 1.0|    3|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|48  | 1.0|    3|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|48  | 1.0|    3|    4| 1.00| 1.1| 1.00|0      | 1.365102|
+|49  | 2.5|    2|    0| 1.83| 1.2| 1.83|1      | 1.688553|
+|49  | 2.5|    2|    1| 1.08| 1.1| 1.17|1      | 1.574516|
+|49  | 2.5|    2|    3| 1.08| 1.1| 1.17|1      | 1.617393|
+|49  | 2.5|    2|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|50  | 2.5|    3|    0| 1.25| 1.5| 1.83|1      | 1.688553|
+|50  | 2.5|    3|    1| 1.33| 1.1| 1.33|1      | 1.574516|
+|50  | 2.5|    3|    3| 1.50| 1.4| 1.50|1      | 1.617393|
+|50  | 2.5|    3|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|51  | 2.5|    1|    0| 1.83| 1.3| 1.50|1      | 1.688553|
+|51  | 2.5|    1|    1| 1.33| 1.0| 1.17|1      | 1.574516|
+|51  | 2.5|    1|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|51  | 2.5|    1|    4| 1.25| 1.0| 1.33|1      | 1.532414|
+|52  | 2.0|   NA|    0| 1.58| 1.3| 1.67|0      | 1.482556|
+|52  | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|52  | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|52  | 2.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|53  | 2.5|    0|    0| 1.00| 1.1| 1.00|1      | 1.688553|
+|53  | 2.5|    0|    1| 1.17| 1.1| 1.00|1      | 1.574516|
+|53  | 2.5|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|53  | 2.5|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|54  | 1.0|    0|    0| 1.33| 1.1| 1.50|0      | 1.482556|
+|54  | 1.0|    0|    1| 1.33| 1.2| 1.17|0      | 1.359807|
+|54  | 1.0|    0|    3| 1.25| 1.2| 1.00|0      | 1.325204|
+|54  | 1.0|    0|    4| 1.25| 1.1| 1.50|0      | 1.365102|
+|55  | 2.5|    1|    0| 1.50| 1.1| 1.17|1      | 1.688553|
+|55  | 2.5|    1|    1| 1.42| 1.0| 1.33|1      | 1.574516|
+|55  | 2.5|    1|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|55  | 2.5|    1|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|56  | 2.0|    0|    0| 1.25| 1.0| 1.33|0      | 1.482556|
+|56  | 2.0|    0|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|56  | 2.0|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|56  | 2.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|57  | 3.0|    0|    0| 2.00| 1.2| 1.17|1      | 1.688553|
+|57  | 3.0|    0|    1| 1.33| 1.2| 1.33|1      | 1.574516|
+|57  | 3.0|    0|    3| 1.42| 1.2| 1.33|1      | 1.617393|
+|57  | 3.0|    0|    4| 1.92| 1.0| 1.33|1      | 1.532414|
+|58  | 1.5|    2|    0| 1.00| 1.1| 1.17|0      | 1.482556|
+|58  | 1.5|    2|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|58  | 1.5|    2|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|58  | 1.5|    2|    4| 1.00| 1.0| 1.17|0      | 1.365102|
+|59  | 1.0|    2|    0| 2.08| 1.8| 1.17|0      | 1.482556|
+|59  | 1.0|    2|    1| 1.25| 1.1| 1.17|0      | 1.359807|
+|59  | 1.0|    2|    3| 1.75| 1.7| 1.33|0      | 1.325204|
+|59  | 1.0|    2|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|60  | 2.5|    2|    0| 1.17| 1.2| 1.17|1      | 1.688553|
+|60  | 2.5|    2|    1| 2.00| 2.0| 1.50|1      | 1.574516|
+|60  | 2.5|    2|    3| 1.50| 1.7| 1.17|1      | 1.617393|
+|60  | 2.5|    2|    4|   NA|  NA|   NA|1      | 1.532414|
+|61  | 3.0|    1|    0| 2.08| 1.7| 1.17|1      | 1.688553|
+|61  | 3.0|    1|    1| 1.92| 1.2| 1.17|1      | 1.574516|
+|61  | 3.0|    1|    3| 2.25| 1.2| 1.33|1      | 1.617393|
+|61  | 3.0|    1|    4| 2.92| 1.6| 1.33|1      | 1.532414|
+|62  | 1.5|    1|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|62  | 1.5|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|62  | 1.5|    1|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|62  | 1.5|    1|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|63  | 2.0|    0|    0| 1.50| 1.2| 1.67|0      | 1.482556|
+|63  | 2.0|    0|    1| 1.42| 1.1| 1.17|0      | 1.359807|
+|63  | 2.0|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|63  | 2.0|    0|    4| 1.17| 1.1| 1.00|0      | 1.365102|
+|64  | 4.0|   NA|    0| 1.58| 1.2| 1.33|1      | 1.688553|
+|64  | 4.0|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|64  | 4.0|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|64  | 4.0|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|65  | 3.0|    5|    0| 2.25| 1.1| 1.17|1      | 1.688553|
+|65  | 3.0|    5|    1| 1.33| 1.1| 1.50|1      | 1.574516|
+|65  | 3.0|    5|    3| 1.83| 1.2| 1.50|1      | 1.617393|
+|65  | 3.0|    5|    4| 2.75| 1.2| 1.83|1      | 1.532414|
+|66  | 1.5|    1|    0| 1.42| 1.3| 1.33|0      | 1.482556|
+|66  | 1.5|    1|    1| 1.25| 1.2| 1.33|0      | 1.359807|
+|66  | 1.5|    1|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|66  | 1.5|    1|    4| 1.33| 1.4| 1.33|0      | 1.365102|
+|67  | 2.5|    3|    0| 1.33| 1.0| 1.17|1      | 1.688553|
+|67  | 2.5|    3|    1| 1.08| 1.1| 1.17|1      | 1.574516|
+|67  | 2.5|    3|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|67  | 2.5|    3|    4| 1.08| 1.1| 1.00|1      | 1.532414|
+|68  | 1.0|    0|    0| 1.00| 1.0| 1.17|0      | 1.482556|
+|68  | 1.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|68  | 1.0|    0|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|68  | 1.0|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|69  | 2.5|    0|    0| 1.58| 1.7| 1.17|1      | 1.688553|
+|69  | 2.5|    0|    1| 1.50| 1.2| 1.50|1      | 1.574516|
+|69  | 2.5|    0|    3| 1.42| 1.3| 1.17|1      | 1.617393|
+|69  | 2.5|    0|    4| 1.50| 1.6| 1.17|1      | 1.532414|
+|70  | 2.5|    0|    0| 1.25| 1.6| 1.17|1      | 1.688553|
+|70  | 2.5|    0|    1| 1.67| 1.5| 1.17|1      | 1.574516|
+|70  | 2.5|    0|    3| 1.83| 1.6| 1.33|1      | 1.617393|
+|70  | 2.5|    0|    4| 1.42| 1.6| 1.17|1      | 1.532414|
+|71  | 3.5|    2|    0| 1.17| 1.2| 1.33|1      | 1.688553|
+|71  | 3.5|    2|    1| 1.42| 1.4| 1.50|1      | 1.574516|
+|71  | 3.5|    2|    3| 1.17| 1.1| 1.33|1      | 1.617393|
+|71  | 3.5|    2|    4|   NA|  NA|   NA|1      | 1.532414|
+|72  | 3.5|    0|    0| 1.08| 1.0| 1.00|1      | 1.688553|
+|72  | 3.5|    0|    1| 1.08| 1.0| 1.00|1      | 1.574516|
+|72  | 3.5|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|72  | 3.5|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|73  | 2.0|    1|    0| 1.42| 1.1| 1.17|0      | 1.482556|
+|73  | 2.0|    1|    1| 1.42| 1.1| 1.33|0      | 1.359807|
+|73  | 2.0|    1|    3| 1.33| 1.1| 1.17|0      | 1.325204|
+|73  | 2.0|    1|    4| 1.33| 1.1| 1.17|0      | 1.365102|
+|74  | 2.5|   NA|    0| 1.42| 1.0| 1.17|1      | 1.688553|
+|74  | 2.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|74  | 2.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|74  | 2.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|75  | 4.0|    2|    0| 1.33| 1.2| 1.17|1      | 1.688553|
+|75  | 4.0|    2|    1| 1.58| 1.2| 1.17|1      | 1.574516|
+|75  | 4.0|    2|    3| 1.33| 1.2| 1.17|1      | 1.617393|
+|75  | 4.0|    2|    4| 1.50| 1.1| 1.17|1      | 1.532414|
+|76  | 2.0|    0|    0| 1.33| 1.3| 1.17|0      | 1.482556|
+|76  | 2.0|    0|    1| 1.08| 1.2| 1.17|0      | 1.359807|
+|76  | 2.0|    0|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|76  | 2.0|    0|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|77  | 3.5|    3|    0| 1.50| 1.3| 1.17|1      | 1.688553|
+|77  | 3.5|    3|    1| 1.58| 1.1| 1.17|1      | 1.574516|
+|77  | 3.5|    3|    3|   NA|  NA|   NA|1      | 1.617393|
+|77  | 3.5|    3|    4| 1.17| 1.0| 1.00|1      | 1.532414|
+|78  | 3.5|    1|    0| 2.25| 2.0| 2.17|1      | 1.688553|
+|78  | 3.5|    1|    1| 2.50| 1.8| 1.67|1      | 1.574516|
+|78  | 3.5|    1|    3| 1.92| 1.4| 2.33|1      | 1.617393|
+|78  | 3.5|    1|    4| 2.08| 1.3| 1.83|1      | 1.532414|
+|79  | 2.5|    0|    0| 1.67| 1.4| 2.17|1      | 1.688553|
+|79  | 2.5|    0|    1| 1.75| 1.3| 1.33|1      | 1.574516|
+|79  | 2.5|    0|    3| 2.08| 1.1| 1.17|1      | 1.617393|
+|79  | 2.5|    0|    4| 2.67| 1.7| 2.33|1      | 1.532414|
+|80  | 3.0|    3|    0| 1.17| 1.0| 1.17|1      | 1.688553|
+|80  | 3.0|    3|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|80  | 3.0|    3|    3| 1.00| 1.0| 1.17|1      | 1.617393|
+|80  | 3.0|    3|    4| 1.08| 1.0| 1.33|1      | 1.532414|
+|81  | 2.5|    0|    0| 1.92| 1.2| 1.17|1      | 1.688553|
+|81  | 2.5|    0|    1| 2.33| 1.8| 1.50|1      | 1.574516|
+|81  | 2.5|    0|    3| 2.33| 1.4| 1.50|1      | 1.617393|
+|81  | 2.5|    0|    4| 2.75| 1.6| 1.33|1      | 1.532414|
+|82  | 3.0|    3|    0| 1.58| 1.2| 1.67|1      | 1.688553|
+|82  | 3.0|    3|    1| 1.17| 1.0| 1.17|1      | 1.574516|
+|82  | 3.0|    3|    3| 1.42| 1.0| 2.00|1      | 1.617393|
+|82  | 3.0|    3|    4| 1.08| 1.2| 1.17|1      | 1.532414|
+|83  | 3.0|    0|    0| 1.17| 1.2| 1.17|1      | 1.688553|
+|83  | 3.0|    0|    1| 1.17| 1.2| 1.17|1      | 1.574516|
+|83  | 3.0|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|83  | 3.0|    0|    4| 1.00| 1.2| 1.17|1      | 1.532414|
+|84  | 3.5|    3|    0| 2.33| 1.9| 3.50|1      | 1.688553|
+|84  | 3.5|    3|    1| 3.17| 1.9| 4.00|1      | 1.574516|
+|84  | 3.5|    3|    3| 3.25| 1.7| 3.33|1      | 1.617393|
+|84  | 3.5|    3|    4| 1.75| 2.0| 2.83|1      | 1.532414|
+|85  | 2.5|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|85  | 2.5|    0|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|85  | 2.5|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|85  | 2.5|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|86  | 2.0|    2|    0| 1.08| 1.2| 1.00|0      | 1.482556|
+|86  | 2.0|    2|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|86  | 2.0|    2|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|86  | 2.0|    2|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|87  | 2.5|    3|    0| 1.50| 1.0| 1.33|1      | 1.688553|
+|87  | 2.5|    3|    1| 1.42| 1.1| 1.33|1      | 1.574516|
+|87  | 2.5|    3|    3| 1.08| 1.1| 1.00|1      | 1.617393|
+|87  | 2.5|    3|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|88  | 3.0|    6|    0| 1.92| 1.4| 2.00|1      | 1.688553|
+|88  | 3.0|    6|    1| 1.33| 1.1| 1.17|1      | 1.574516|
+|88  | 3.0|    6|    3| 2.17| 2.1| 1.67|1      | 1.617393|
+|88  | 3.0|    6|    4| 1.67| 1.4| 1.33|1      | 1.532414|
+|89  | 3.0|    0|    0| 1.25| 1.1| 1.17|1      | 1.688553|
+|89  | 3.0|    0|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|89  | 3.0|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|89  | 3.0|    0|    4| 1.08| 1.1| 1.00|1      | 1.532414|
+|90  | 2.5|   NA|    0| 1.50| 1.3| 1.17|1      | 1.688553|
+|90  | 2.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|90  | 2.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|90  | 2.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|91  | 2.5|    4|    0| 2.33| 1.1| 1.83|1      | 1.688553|
+|91  | 2.5|    4|    1| 2.08| 1.2| 1.50|1      | 1.574516|
+|91  | 2.5|    4|    3| 2.08| 1.7| 1.67|1      | 1.617393|
+|91  | 2.5|    4|    4|   NA|  NA|   NA|1      | 1.532414|
+|92  | 2.0|    2|    0| 1.00| 1.2| 1.17|0      | 1.482556|
+|92  | 2.0|    2|    1| 1.33| 1.1| 1.17|0      | 1.359807|
+|92  | 2.0|    2|    3| 1.17| 1.0| 1.17|0      | 1.325204|
+|92  | 2.0|    2|    4| 1.00| 1.0| 1.17|0      | 1.365102|
+|93  | 2.5|    3|    0| 2.17| 1.5| 2.00|1      | 1.688553|
+|93  | 2.5|    3|    1| 1.42| 1.2| 2.00|1      | 1.574516|
+|93  | 2.5|    3|    3| 1.42| 1.2| 1.67|1      | 1.617393|
+|93  | 2.5|    3|    4| 1.83| 1.2| 1.67|1      | 1.532414|
+|94  | 3.0|    2|    0| 1.58| 1.6| 1.33|1      | 1.688553|
+|94  | 3.0|    2|    1| 1.33| 1.2| 1.17|1      | 1.574516|
+|94  | 3.0|    2|    3| 1.25| 1.5| 1.17|1      | 1.617393|
+|94  | 3.0|    2|    4| 1.33| 1.1| 1.33|1      | 1.532414|
+|95  | 2.0|   NA|    0| 1.67| 1.2| 1.17|0      | 1.482556|
+|95  | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|95  | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|95  | 2.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|96  | 2.0|    3|    0| 1.50| 1.2| 1.33|0      | 1.482556|
+|96  | 2.0|    3|    1| 1.42| 1.0| 1.17|0      | 1.359807|
+|96  | 2.0|    3|    3| 1.17| 1.0| 1.33|0      | 1.325204|
+|96  | 2.0|    3|    4| 2.00| 2.0| 1.50|0      | 1.365102|
+|97  | 3.5|    4|    0| 2.67| 1.7| 1.17|1      | 1.688553|
+|97  | 3.5|    4|    1| 2.17| 1.8| 1.17|1      | 1.574516|
+|97  | 3.5|    4|    3| 1.83| 1.5| 1.17|1      | 1.617393|
+|97  | 3.5|    4|    4| 1.00| 1.1| 1.17|1      | 1.532414|
+|98  | 2.5|    2|    0| 2.00| 1.3| 1.17|1      | 1.688553|
+|98  | 2.5|    2|    1| 2.83| 1.3| 2.00|1      | 1.574516|
+|98  | 2.5|    2|    3| 1.50| 1.1| 1.17|1      | 1.617393|
+|98  | 2.5|    2|    4| 1.58| 1.1| 1.33|1      | 1.532414|
+|99  | 4.0|    1|    0| 1.08| 1.2| 1.17|1      | 1.688553|
+|99  | 4.0|    1|    1| 1.58| 2.3| 1.17|1      | 1.574516|
+|99  | 4.0|    1|    3| 1.58| 1.5| 1.67|1      | 1.617393|
+|99  | 4.0|    1|    4| 1.42| 2.5| 1.50|1      | 1.532414|
+|100 | 3.0|    3|    0| 2.25| 1.3| 1.50|1      | 1.688553|
+|100 | 3.0|    3|    1| 2.42| 1.8| 1.67|1      | 1.574516|
+|100 | 3.0|    3|    3| 1.58| 1.3| 1.33|1      | 1.617393|
+|100 | 3.0|    3|    4| 1.17| 1.2| 1.00|1      | 1.532414|
+|101 | 3.5|    1|    0| 1.17| 1.3| 1.00|1      | 1.688553|
+|101 | 3.5|    1|    1| 1.00| 1.2| 1.00|1      | 1.574516|
+|101 | 3.5|    1|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|101 | 3.5|    1|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|102 | 2.5|    2|    0| 1.17| 1.2| 1.17|1      | 1.688553|
+|102 | 2.5|    2|    1| 1.67| 1.3| 1.17|1      | 1.574516|
+|102 | 2.5|    2|    3| 1.33| 1.3| 1.17|1      | 1.617393|
+|102 | 2.5|    2|    4| 1.42| 1.2| 1.17|1      | 1.532414|
+|103 | 2.0|    0|    0| 1.67| 1.3| 1.17|0      | 1.482556|
+|103 | 2.0|    0|    1| 1.42| 1.0| 1.17|0      | 1.359807|
+|103 | 2.0|    0|    3| 1.42| 1.1| 1.17|0      | 1.325204|
+|103 | 2.0|    0|    4| 1.50| 1.1| 1.17|0      | 1.365102|
+|104 | 2.0|    0|    0| 1.42| 1.0| 1.33|0      | 1.482556|
+|104 | 2.0|    0|    1| 1.33| 1.1| 1.33|0      | 1.359807|
+|104 | 2.0|    0|    3| 1.75| 1.1| 1.17|0      | 1.325204|
+|104 | 2.0|    0|    4| 2.33| 1.1| 1.33|0      | 1.365102|
+|105 | 3.0|    3|    0| 1.92| 1.7| 1.67|1      | 1.688553|
+|105 | 3.0|    3|    1| 2.08| 1.6| 1.17|1      | 1.574516|
+|105 | 3.0|    3|    3| 4.08| 3.3| 1.67|1      | 1.617393|
+|105 | 3.0|    3|    4| 2.17| 2.0| 1.17|1      | 1.532414|
+|106 | 2.0|    5|    0| 3.00| 2.9| 1.83|0      | 1.482556|
+|106 | 2.0|    5|    1| 3.08| 2.6| 1.83|0      | 1.359807|
+|106 | 2.0|    5|    3| 1.92| 1.5| 1.50|0      | 1.325204|
+|106 | 2.0|    5|    4| 3.25| 1.7| 1.67|0      | 1.365102|
+|107 | 2.5|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|107 | 2.5|    0|    1| 1.17| 1.0| 1.00|1      | 1.574516|
+|107 | 2.5|    0|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|107 | 2.5|    0|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|108 | 3.5|    3|    0| 1.25| 1.5| 2.00|1      | 1.688553|
+|108 | 3.5|    3|    1| 1.25| 1.1| 1.17|1      | 1.574516|
+|108 | 3.5|    3|    3| 1.08| 1.2| 1.17|1      | 1.617393|
+|108 | 3.5|    3|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|109 | 1.5|    0|    0| 2.17| 1.3| 1.50|0      | 1.482556|
+|109 | 1.5|    0|    1| 1.67| 1.3| 1.17|0      | 1.359807|
+|109 | 1.5|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|109 | 1.5|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|110 | 3.0|    3|    0| 1.17| 1.1| 1.17|1      | 1.688553|
+|110 | 3.0|    3|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|110 | 3.0|    3|    3|   NA|  NA|   NA|1      | 1.617393|
+|110 | 3.0|    3|    4|   NA|  NA|   NA|1      | 1.532414|
+|111 | 1.0|    0|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|111 | 1.0|    0|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|111 | 1.0|    0|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|111 | 1.0|    0|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|112 | 1.0|    1|    0| 1.17| 1.1| 1.17|0      | 1.482556|
+|112 | 1.0|    1|    1| 1.08| 1.1| 1.00|0      | 1.359807|
+|112 | 1.0|    1|    3| 1.25| 1.4| 1.17|0      | 1.325204|
+|112 | 1.0|    1|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|113 | 1.0|    2|    0| 1.50| 1.1| 1.50|0      | 1.482556|
+|113 | 1.0|    2|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|113 | 1.0|    2|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|113 | 1.0|    2|    4|   NA|  NA|   NA|0      | 1.365102|
+|114 | 4.0|    4|    0| 1.33| 1.6| 1.67|1      | 1.688553|
+|114 | 4.0|    4|    1| 1.17| 1.3| 1.67|1      | 1.574516|
+|114 | 4.0|    4|    3| 1.33| 1.4| 1.33|1      | 1.617393|
+|114 | 4.0|    4|    4| 1.25| 1.2| 1.33|1      | 1.532414|
+|115 | 1.5|    1|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|115 | 1.5|    1|    1| 1.33| 1.0| 1.17|0      | 1.359807|
+|115 | 1.5|    1|    3| 1.17| 1.0| 1.33|0      | 1.325204|
+|115 | 1.5|    1|    4| 2.33| 1.7| 1.50|0      | 1.365102|
+|116 | 1.0|    0|    0| 1.33| 1.1| 1.17|0      | 1.482556|
+|116 | 1.0|    0|    1| 1.00| 1.0| 1.17|0      | 1.359807|
+|116 | 1.0|    0|    3| 1.17| 1.2| 1.17|0      | 1.325204|
+|116 | 1.0|    0|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|117 | 2.5|    1|    0| 1.25| 1.0| 1.50|1      | 1.688553|
+|117 | 2.5|    1|    1| 1.17| 1.0| 1.33|1      | 1.574516|
+|117 | 2.5|    1|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|117 | 2.5|    1|    4| 1.00| 1.2| 1.17|1      | 1.532414|
+|118 | 2.0|    5|    0| 2.17| 1.3| 1.17|0      | 1.482556|
+|118 | 2.0|    5|    1| 1.67| 1.4| 1.33|0      | 1.359807|
+|118 | 2.0|    5|    3| 2.17| 1.9| 1.17|0      | 1.325204|
+|118 | 2.0|    5|    4| 1.33| 1.2| 1.17|0      | 1.365102|
+|119 | 1.5|    0|    0| 1.42| 1.2| 1.00|0      | 1.482556|
+|119 | 1.5|    0|    1| 1.33| 1.2| 1.00|0      | 1.359807|
+|119 | 1.5|    0|    3| 1.50| 1.2| 1.33|0      | 1.325204|
+|119 | 1.5|    0|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|120 | 1.5|   NA|    0| 1.17| 1.1| 1.17|0      | 1.482556|
+|120 | 1.5|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|120 | 1.5|   NA|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|120 | 1.5|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|121 | 1.5|    0|    0| 1.67| 2.1| 1.17|0      | 1.482556|
+|121 | 1.5|    0|    1| 1.67| 1.7| 1.50|0      | 1.359807|
+|121 | 1.5|    0|    3| 1.75| 1.4| 1.33|0      | 1.325204|
+|121 | 1.5|    0|    4| 1.33| 1.3| 1.00|0      | 1.365102|
+|122 | 1.5|    2|    0| 2.25| 1.4| 1.83|0      | 1.482556|
+|122 | 1.5|    2|    1| 1.58| 1.2| 1.33|0      | 1.359807|
+|122 | 1.5|    2|    3| 1.67| 1.3| 1.17|0      | 1.325204|
+|122 | 1.5|    2|    4| 1.83| 1.3| 1.17|0      | 1.365102|
+|123 | 1.5|    0|    0| 1.25| 1.4| 1.17|0      | 1.482556|
+|123 | 1.5|    0|    1| 1.08| 1.2| 1.17|0      | 1.359807|
+|123 | 1.5|    0|    3| 1.50| 1.3| 1.17|0      | 1.325204|
+|123 | 1.5|    0|    4| 1.08| 1.1| 1.17|0      | 1.365102|
+|124 | 3.5|    1|    0| 2.92| 2.0| 2.17|1      | 1.688553|
+|124 | 3.5|    1|    1| 1.83| 1.3| 2.00|1      | 1.574516|
+|124 | 3.5|    1|    3| 2.25| 2.8| 1.67|1      | 1.617393|
+|124 | 3.5|    1|    4| 1.17| 1.2| 1.17|1      | 1.532414|
+|125 | 2.5|    3|    0| 1.08| 1.0| 1.00|1      | 1.688553|
+|125 | 2.5|    3|    1| 2.75| 1.4| 2.17|1      | 1.574516|
+|125 | 2.5|    3|    3| 2.00| 1.7| 1.17|1      | 1.617393|
+|125 | 2.5|    3|    4| 1.17| 1.1| 1.50|1      | 1.532414|
+|126 | 2.5|    1|    0| 2.17| 1.8| 1.83|1      | 1.688553|
+|126 | 2.5|    1|    1| 1.83| 1.3| 1.33|1      | 1.574516|
+|126 | 2.5|    1|    3| 1.58| 1.3| 1.17|1      | 1.617393|
+|126 | 2.5|    1|    4| 2.17| 1.8| 2.67|1      | 1.532414|
+|127 | 3.5|    2|    0| 1.42| 1.3| 1.33|1      | 1.688553|
+|127 | 3.5|    2|    1| 2.25| 1.6| 1.17|1      | 1.574516|
+|127 | 3.5|    2|    3| 1.75| 1.2| 1.17|1      | 1.617393|
+|127 | 3.5|    2|    4| 1.92| 1.2| 1.33|1      | 1.532414|
+|128 | 2.0|    2|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|128 | 2.0|    2|    1| 1.25| 1.1| 1.33|0      | 1.359807|
+|128 | 2.0|    2|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|128 | 2.0|    2|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|129 | 3.5|    0|    0| 1.67| 1.5| 2.17|1      | 1.688553|
+|129 | 3.5|    0|    1| 2.08| 1.2| 2.50|1      | 1.574516|
+|129 | 3.5|    0|    3| 2.42| 1.8| 3.67|1      | 1.617393|
+|129 | 3.5|    0|    4| 2.50| 1.2| 3.33|1      | 1.532414|
+|130 | 1.5|    1|    0| 1.33| 1.0| 1.67|0      | 1.482556|
+|130 | 1.5|    1|    1| 1.00| 1.0| 1.17|0      | 1.359807|
+|130 | 1.5|    1|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|130 | 1.5|    1|    4| 1.17| 1.2| 1.17|0      | 1.365102|
+|131 | 2.0|    1|    0| 1.75| 1.1| 1.50|0      | 1.482556|
+|131 | 2.0|    1|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|131 | 2.0|    1|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|131 | 2.0|    1|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|132 | 1.0|    2|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|132 | 1.0|    2|    1| 1.25| 1.1| 1.00|0      | 1.359807|
+|132 | 1.0|    2|    3|   NA|  NA|   NA|0      | 1.325204|
+|132 | 1.0|    2|    4|   NA|  NA|   NA|0      | 1.365102|
+|133 | 1.0|    1|    0| 1.58| 1.2| 1.67|0      | 1.482556|
+|133 | 1.0|    1|    1| 1.25| 1.1| 1.33|0      | 1.359807|
+|133 | 1.0|    1|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|133 | 1.0|    1|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|134 | 3.5|    3|    0| 1.50| 1.4| 1.83|1      | 1.688553|
+|134 | 3.5|    3|    1| 1.75| 1.3| 1.33|1      | 1.574516|
+|134 | 3.5|    3|    3| 1.58| 1.2| 1.17|1      | 1.617393|
+|134 | 3.5|    3|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|135 | 2.0|    0|    0| 1.75| 1.3| 1.83|0      | 1.482556|
+|135 | 2.0|    0|    1| 1.75| 1.1| 1.33|0      | 1.359807|
+|135 | 2.0|    0|    3| 1.25| 1.1| 1.50|0      | 1.325204|
+|135 | 2.0|    0|    4| 1.25| 1.0| 1.33|0      | 1.365102|
+|136 | 1.0|    0|    0| 1.50| 1.2| 1.17|0      | 1.482556|
+|136 | 1.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|136 | 1.0|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|136 | 1.0|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|137 | 2.0|    2|    0| 1.17| 1.4| 1.17|0      | 1.482556|
+|137 | 2.0|    2|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|137 | 2.0|    2|    3| 1.67| 1.9| 1.50|0      | 1.325204|
+|137 | 2.0|    2|    4| 1.00| 1.2| 1.00|0      | 1.365102|
+|138 | 3.0|    0|    0| 1.08| 1.1| 1.17|1      | 1.688553|
+|138 | 3.0|    0|    1| 1.08| 1.1| 1.17|1      | 1.574516|
+|138 | 3.0|    0|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|138 | 3.0|    0|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|139 | 2.0|    0|    0| 1.75| 1.5| 2.17|0      | 1.482556|
+|139 | 2.0|    0|    1| 1.25| 1.0| 1.33|0      | 1.359807|
+|139 | 2.0|    0|    3| 1.33| 1.2| 1.50|0      | 1.325204|
+|139 | 2.0|    0|    4| 1.58| 1.1| 1.83|0      | 1.365102|
+|140 | 2.0|    0|    0| 1.42| 1.1| 1.17|0      | 1.482556|
+|140 | 2.0|    0|    1| 1.08| 1.1| 1.17|0      | 1.359807|
+|140 | 2.0|    0|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|140 | 2.0|    0|    4| 1.08| 1.1| 1.17|0      | 1.365102|
+|141 | 3.0|    3|    0| 1.08| 1.1| 1.17|1      | 1.688553|
+|141 | 3.0|    3|    1| 1.00| 1.1| 1.00|1      | 1.574516|
+|141 | 3.0|    3|    3| 1.17| 1.0| 1.17|1      | 1.617393|
+|141 | 3.0|    3|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|142 | 3.0|   NA|    0| 1.42| 1.3| 1.67|1      | 1.688553|
+|142 | 3.0|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|142 | 3.0|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|142 | 3.0|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|143 | 3.0|    3|    0| 1.33| 1.4| 1.33|1      | 1.688553|
+|143 | 3.0|    3|    1| 1.00| 1.0| 1.17|1      | 1.574516|
+|143 | 3.0|    3|    3| 1.18| 1.3| 1.83|1      | 1.617393|
+|143 | 3.0|    3|    4| 1.17| 1.2| 1.33|1      | 1.532414|
+|144 | 1.5|   NA|    0| 2.08| 1.5| 2.17|0      | 1.482556|
+|144 | 1.5|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|144 | 1.5|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|144 | 1.5|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|145 | 2.5|    2|    0| 1.50| 1.3| 1.33|1      | 1.688553|
+|145 | 2.5|    2|    1| 1.50| 1.2| 1.33|1      | 1.574516|
+|145 | 2.5|    2|    3| 1.50| 1.3| 1.67|1      | 1.617393|
+|145 | 2.5|    2|    4| 1.25| 1.2| 1.33|1      | 1.532414|
+|146 | 3.0|    5|    0| 1.25| 1.2| 1.50|1      | 1.688553|
+|146 | 3.0|    5|    1| 1.17| 1.0| 1.33|1      | 1.574516|
+|146 | 3.0|    5|    3| 1.17| 1.0| 1.50|1      | 1.617393|
+|146 | 3.0|    5|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|147 | 3.5|    0|    0| 2.50| 2.6| 2.17|1      | 1.688553|
+|147 | 3.5|    0|    1| 1.75| 1.7| 1.17|1      | 1.574516|
+|147 | 3.5|    0|    3| 1.75| 2.0| 1.17|1      | 1.617393|
+|147 | 3.5|    0|    4| 1.75| 1.6| 1.83|1      | 1.532414|
+|148 | 2.5|    2|    0| 2.00| 1.9| 1.33|1      | 1.688553|
+|148 | 2.5|    2|    1| 2.00| 2.2| 1.67|1      | 1.574516|
+|148 | 2.5|    2|    3| 3.00| 2.6| 1.33|1      | 1.617393|
+|148 | 2.5|    2|    4| 3.00| 2.8| 1.83|1      | 1.532414|
+|149 | 2.5|    0|    0| 1.25| 1.0| 1.33|1      | 1.688553|
+|149 | 2.5|    0|    1| 1.33| 1.0| 1.17|1      | 1.574516|
+|149 | 2.5|    0|    3| 1.17| 1.0| 1.50|1      | 1.617393|
+|149 | 2.5|    0|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|150 | 2.0|    4|    0| 1.42| 1.1| 1.17|0      | 1.482556|
+|150 | 2.0|    4|    1| 1.75| 1.1| 1.33|0      | 1.359807|
+|150 | 2.0|    4|    3| 1.00| 1.2| 1.00|0      | 1.325204|
+|150 | 2.0|    4|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|151 | 1.5|    1|    0| 1.50| 1.0| 1.17|0      | 1.482556|
+|151 | 1.5|    1|    1| 1.42| 1.1| 1.17|0      | 1.359807|
+|151 | 1.5|    1|    3| 1.33| 1.1| 1.17|0      | 1.325204|
+|151 | 1.5|    1|    4| 1.83| 1.3| 1.17|0      | 1.365102|
+|152 | 2.0|    1|    0| 1.50| 1.2| 1.17|0      | 1.482556|
+|152 | 2.0|    1|    1| 1.33| 1.6| 1.17|0      | 1.359807|
+|152 | 2.0|    1|    3| 1.67| 2.3| 1.33|0      | 1.325204|
+|152 | 2.0|    1|    4| 2.00| 1.3| 1.50|0      | 1.365102|
+|153 | 1.5|    0|    0| 1.33| 1.2| 1.17|0      | 1.482556|
+|153 | 1.5|    0|    1| 1.08| 1.1| 1.17|0      | 1.359807|
+|153 | 1.5|    0|    3| 1.08| 1.4| 1.17|0      | 1.325204|
+|153 | 1.5|    0|    4| 1.33| 1.1| 1.17|0      | 1.365102|
+|154 | 1.0|    0|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|154 | 1.0|    0|    1| 1.00| 1.0| 1.17|0      | 1.359807|
+|154 | 1.0|    0|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|154 | 1.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|155 | 2.5|    0|    0| 1.75| 1.3| 1.67|1      | 1.688553|
+|155 | 2.5|    0|    1| 2.08| 1.8| 1.17|1      | 1.574516|
+|155 | 2.5|    0|    3| 1.67| 2.2| 1.50|1      | 1.617393|
+|155 | 2.5|    0|    4| 1.67| 1.3| 1.67|1      | 1.532414|
+|156 | 1.0|    0|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|156 | 1.0|    0|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|156 | 1.0|    0|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|156 | 1.0|    0|    4| 1.25| 1.2| 1.00|0      | 1.365102|
+|157 | 3.0|    2|    0| 1.50| 1.1| 1.17|1      | 1.688553|
+|157 | 3.0|    2|    1| 1.67| 1.0| 1.17|1      | 1.574516|
+|157 | 3.0|    2|    3| 1.00| 1.2| 1.17|1      | 1.617393|
+|157 | 3.0|    2|    4| 1.33| 1.2| 1.17|1      | 1.532414|
+|158 | 4.5|    2|    0| 1.67| 1.3| 1.33|1      | 1.688553|
+|158 | 4.5|    2|    1| 1.17| 1.1| 1.00|1      | 1.574516|
+|158 | 4.5|    2|    3| 1.25| 1.4| 1.00|1      | 1.617393|
+|158 | 4.5|    2|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|159 | 1.0|    0|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|159 | 1.0|    0|    1| 1.00| 1.1| 1.17|0      | 1.359807|
+|159 | 1.0|    0|    3| 1.00| 1.1| 1.00|0      | 1.325204|
+|159 | 1.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|160 | 4.0|    6|    0| 1.67| 1.1| 1.50|1      | 1.688553|
+|160 | 4.0|    6|    1| 1.75| 1.5| 1.67|1      | 1.574516|
+|160 | 4.0|    6|    3| 1.83| 1.3| 1.83|1      | 1.617393|
+|160 | 4.0|    6|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|161 | 3.0|    2|    0| 1.58| 1.0| 1.17|1      | 1.688553|
+|161 | 3.0|    2|    1| 1.17| 1.0| 1.00|1      | 1.574516|
+|161 | 3.0|    2|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|161 | 3.0|    2|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|162 | 2.5|    5|    0| 1.67| 1.2| 1.67|1      | 1.688553|
+|162 | 2.5|    5|    1| 1.83| 1.2| 1.33|1      | 1.574516|
+|162 | 2.5|    5|    3| 1.25| 1.1| 1.50|1      | 1.617393|
+|162 | 2.5|    5|    4| 1.33| 1.2| 1.33|1      | 1.532414|
+|163 | 3.0|    1|    0| 2.33| 1.9| 1.50|1      | 1.688553|
+|163 | 3.0|    1|    1| 3.83| 3.0| 3.33|1      | 1.574516|
+|163 | 3.0|    1|    3| 4.42| 3.2| 3.83|1      | 1.617393|
+|163 | 3.0|    1|    4| 4.58| 2.5| 2.17|1      | 1.532414|
+|164 | 2.0|    5|    0| 2.25| 1.5| 1.33|0      | 1.482556|
+|164 | 2.0|    5|    1| 1.92| 1.5| 1.67|0      | 1.359807|
+|164 | 2.0|    5|    3| 2.00| 1.6| 1.33|0      | 1.325204|
+|164 | 2.0|    5|    4| 2.00| 1.4| 1.50|0      | 1.365102|
+|165 | 2.0|    2|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|165 | 2.0|    2|    1| 1.17| 1.1| 1.50|0      | 1.359807|
+|165 | 2.0|    2|    3| 1.08| 1.1| 1.33|0      | 1.325204|
+|165 | 2.0|    2|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|166 | 3.5|    6|    0| 1.58| 1.2| 1.50|1      | 1.688553|
+|166 | 3.5|    6|    1| 2.08| 1.7| 1.83|1      | 1.574516|
+|166 | 3.5|    6|    3| 2.58| 1.7| 1.67|1      | 1.617393|
+|166 | 3.5|    6|    4| 1.33| 1.4| 1.17|1      | 1.532414|
+|167 | 2.5|    2|    0| 1.42| 1.2| 1.17|1      | 1.688553|
+|167 | 2.5|    2|    1| 1.17| 1.2| 1.00|1      | 1.574516|
+|167 | 2.5|    2|    3| 1.50| 1.3| 1.17|1      | 1.617393|
+|167 | 2.5|    2|    4| 1.33| 1.1| 1.33|1      | 1.532414|
+|168 | 2.0|    2|    0| 1.25| 1.0| 1.33|0      | 1.482556|
+|168 | 2.0|    2|    1| 1.50| 1.2| 1.17|0      | 1.359807|
+|168 | 2.0|    2|    3| 1.33| 1.3| 1.50|0      | 1.325204|
+|168 | 2.0|    2|    4| 1.58| 1.3| 1.17|0      | 1.365102|
+|169 | 1.5|    0|    0| 1.42| 1.2| 1.33|0      | 1.482556|
+|169 | 1.5|    0|    1| 1.08| 1.1| 1.00|0      | 1.359807|
+|169 | 1.5|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|169 | 1.5|    0|    4| 1.17| 1.2| 1.00|0      | 1.365102|
+|170 | 2.0|    3|    0| 1.42| 1.4| 1.17|0      | 1.482556|
+|170 | 2.0|    3|    1| 1.92| 1.5| 1.50|0      | 1.359807|
+|170 | 2.0|    3|    3| 1.92| 1.3| 1.33|0      | 1.325204|
+|170 | 2.0|    3|    4| 1.83| 1.1| 1.33|0      | 1.365102|
+|171 | 2.0|   NA|    0| 1.08| 1.3| 1.00|0      | 1.482556|
+|171 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|171 | 2.0|   NA|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|171 | 2.0|   NA|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|172 | 2.5|    2|    0| 1.83| 1.1| 1.00|1      | 1.688553|
+|172 | 2.5|    2|    1| 1.42| 1.0| 1.17|1      | 1.574516|
+|172 | 2.5|    2|    3| 1.33| 1.1| 1.17|1      | 1.617393|
+|172 | 2.5|    2|    4| 1.50| 1.0| 1.00|1      | 1.532414|
+|173 | 1.0|    0|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|173 | 1.0|    0|    1| 1.42| 1.1| 1.33|0      | 1.359807|
+|173 | 1.0|    0|    3| 1.50| 1.1| 1.17|0      | 1.325204|
+|173 | 1.0|    0|    4| 1.08| 1.4| 1.00|0      | 1.365102|
+|174 | 2.0|    6|    0| 2.58| 2.4| 2.17|0      | 1.482556|
+|174 | 2.0|    6|    1| 2.67| 1.4| 2.50|0      | 1.359807|
+|174 | 2.0|    6|    3| 3.33| 2.0| 2.50|0      | 1.325204|
+|174 | 2.0|    6|    4| 1.50| 1.6| 1.00|0      | 1.365102|
+|175 | 2.5|    1|    0| 2.25| 1.5| 2.00|1      | 1.688553|
+|175 | 2.5|    1|    1| 2.08| 1.2| 1.67|1      | 1.574516|
+|175 | 2.5|    1|    3| 2.08| 1.7| 2.50|1      | 1.617393|
+|175 | 2.5|    1|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|176 | 3.0|    4|    0| 1.75| 1.1| 1.33|1      | 1.688553|
+|176 | 3.0|    4|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|176 | 3.0|    4|    3| 1.75| 1.1| 1.17|1      | 1.617393|
+|176 | 3.0|    4|    4| 2.58| 1.3| 1.50|1      | 1.532414|
+|177 | 2.5|    5|    0| 1.67| 1.6| 1.33|1      | 1.688553|
+|177 | 2.5|    5|    1| 1.50| 1.4| 1.67|1      | 1.574516|
+|177 | 2.5|    5|    3| 1.17| 1.5| 1.17|1      | 1.617393|
+|177 | 2.5|    5|    4| 1.42| 1.4| 1.17|1      | 1.532414|
+|178 | 1.0|    1|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|178 | 1.0|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|178 | 1.0|    1|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|178 | 1.0|    1|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|179 | 3.5|    4|    0| 1.42| 1.1| 1.50|1      | 1.688553|
+|179 | 3.5|    4|    1| 2.08| 1.3| 1.50|1      | 1.574516|
+|179 | 3.5|    4|    3| 2.92| 1.1| 2.00|1      | 1.617393|
+|179 | 3.5|    4|    4| 1.33| 1.1| 1.50|1      | 1.532414|
+|180 | 3.5|    2|    0| 1.42| 1.0| 1.50|1      | 1.688553|
+|180 | 3.5|    2|    1| 1.42| 1.0| 1.50|1      | 1.574516|
+|180 | 3.5|    2|    3| 4.08| 1.9| 3.00|1      | 1.617393|
+|180 | 3.5|    2|    4| 1.83| 1.0| 1.33|1      | 1.532414|
+|181 | 3.5|   NA|    0| 1.50| 1.6| 2.33|1      | 1.688553|
+|181 | 3.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|181 | 3.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|181 | 3.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|182 | 1.0|    0|    0| 1.25| 1.0| 1.17|0      | 1.482556|
+|182 | 1.0|    0|    1| 1.17| 1.0| 1.00|0      | 1.359807|
+|182 | 1.0|    0|    3| 1.25| 1.0| 1.00|0      | 1.325204|
+|182 | 1.0|    0|    4| 1.67| 1.0| 1.00|0      | 1.365102|
+|183 | 2.5|    2|    0| 1.42| 1.2| 1.50|1      | 1.688553|
+|183 | 2.5|    2|    1| 1.67| 1.3| 1.17|1      | 1.574516|
+|183 | 2.5|    2|    3| 1.33| 1.2| 1.17|1      | 1.617393|
+|183 | 2.5|    2|    4| 1.42| 1.3| 1.17|1      | 1.532414|
+|184 | 2.0|    1|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|184 | 2.0|    1|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|184 | 2.0|    1|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|184 | 2.0|    1|    4| 1.25| 1.0| 1.17|0      | 1.365102|
+|185 | 1.0|    0|    0| 2.42| 1.2| 1.67|0      | 1.482556|
+|185 | 1.0|    0|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|185 | 1.0|    0|    3| 1.17| 1.2| 1.17|0      | 1.325204|
+|185 | 1.0|    0|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|186 | 2.0|    0|    0| 1.08| 1.2| 1.17|0      | 1.482556|
+|186 | 2.0|    0|    1| 1.42| 1.2| 1.17|0      | 1.359807|
+|186 | 2.0|    0|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|186 | 2.0|    0|    4| 1.17| 1.1| 1.00|0      | 1.365102|
+|187 | 1.0|    1|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|187 | 1.0|    1|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|187 | 1.0|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|187 | 1.0|    1|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|188 | 3.5|    1|    0| 1.75| 1.2| 1.17|1      | 1.688553|
+|188 | 3.5|    1|    1| 1.67| 1.6| 1.17|1      | 1.574516|
+|188 | 3.5|    1|    3| 1.83| 1.3| 1.17|1      | 1.617393|
+|188 | 3.5|    1|    4| 1.92| 1.9| 1.33|1      | 1.532414|
+|189 | 1.5|    0|    0| 1.08| 1.2| 1.17|0      | 1.482556|
+|189 | 1.5|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|189 | 1.5|    0|    3| 1.00| 1.1| 1.00|0      | 1.325204|
+|189 | 1.5|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|190 | 3.0|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|190 | 3.0|    0|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|190 | 3.0|    0|    3|   NA|  NA|   NA|1      | 1.617393|
+|190 | 3.0|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|191 | 2.5|    3|    0| 1.50| 1.6| 1.67|1      | 1.688553|
+|191 | 2.5|    3|    1| 1.08| 1.2| 1.00|1      | 1.574516|
+|191 | 2.5|    3|    3| 1.08| 1.4| 1.33|1      | 1.617393|
+|191 | 2.5|    3|    4| 1.92| 1.4| 1.00|1      | 1.532414|
+|192 | 1.5|    0|    0| 2.33| 1.3| 1.83|0      | 1.482556|
+|192 | 1.5|    0|    1| 1.92| 1.2| 1.50|0      | 1.359807|
+|192 | 1.5|    0|    3| 1.67| 1.3| 1.83|0      | 1.325204|
+|192 | 1.5|    0|    4| 2.75| 1.5| 3.17|0      | 1.365102|
+|193 | 3.0|    2|    0| 1.67| 1.7| 1.33|1      | 1.688553|
+|193 | 3.0|    2|    1| 1.33| 1.3| 1.33|1      | 1.574516|
+|193 | 3.0|    2|    3| 1.67| 1.6| 1.33|1      | 1.617393|
+|193 | 3.0|    2|    4| 1.58| 1.3| 1.33|1      | 1.532414|
+|194 | 2.0|    2|    0| 1.67| 1.3| 1.33|0      | 1.482556|
+|194 | 2.0|    2|    1| 1.58| 1.4| 1.17|0      | 1.359807|
+|194 | 2.0|    2|    3| 1.75| 1.6| 1.33|0      | 1.325204|
+|194 | 2.0|    2|    4| 2.33| 2.5| 1.67|0      | 1.365102|
+|195 | 1.5|    1|    0| 1.75| 1.2| 1.33|0      | 1.482556|
+|195 | 1.5|    1|    1| 1.08| 1.2| 1.17|0      | 1.359807|
+|195 | 1.5|    1|    3| 1.33| 1.1| 1.33|0      | 1.325204|
+|195 | 1.5|    1|    4| 1.08| 1.2| 1.00|0      | 1.365102|
+|196 | 2.0|    2|    0| 1.50| 1.2| 2.17|0      | 1.482556|
+|196 | 2.0|    2|    1| 1.25| 1.0| 1.17|0      | 1.359807|
+|196 | 2.0|    2|    3| 1.42| 1.1| 1.17|0      | 1.325204|
+|196 | 2.0|    2|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|197 | 3.0|    4|    0| 1.58| 1.0| 1.17|1      | 1.688553|
+|197 | 3.0|    4|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|197 | 3.0|    4|    3| 1.42| 1.0| 1.33|1      | 1.617393|
+|197 | 3.0|    4|    4| 1.67| 1.1| 1.00|1      | 1.532414|
+|198 | 1.0|    2|    0| 1.42| 1.3| 1.00|0      | 1.482556|
+|198 | 1.0|    2|    1| 1.67| 1.6| 1.50|0      | 1.359807|
+|198 | 1.0|    2|    3| 1.25| 1.4| 1.17|0      | 1.325204|
+|198 | 1.0|    2|    4| 1.42| 1.7| 1.17|0      | 1.365102|
+|199 | 2.5|    0|    0| 1.50| 1.7| 1.17|1      | 1.688553|
+|199 | 2.5|    0|    1| 1.75| 1.6| 1.33|1      | 1.574516|
+|199 | 2.5|    0|    3| 2.00| 2.2| 1.17|1      | 1.617393|
+|199 | 2.5|    0|    4| 1.75| 2.5| 1.83|1      | 1.532414|
+|200 | 3.0|    2|    0| 1.25| 1.4| 1.17|1      | 1.688553|
+|200 | 3.0|    2|    1| 1.00| 1.0| 1.33|1      | 1.574516|
+|200 | 3.0|    2|    3| 2.25| 1.4| 1.67|1      | 1.617393|
+|200 | 3.0|    2|    4|   NA|  NA|   NA|1      | 1.532414|
+|201 | 2.5|   NA|    0| 2.25| 1.9| 2.17|1      | 1.688553|
+|201 | 2.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|201 | 2.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|201 | 2.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|202 | 2.0|    5|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|202 | 2.0|    5|    1| 1.17| 1.0| 1.50|0      | 1.359807|
+|202 | 2.0|    5|    3| 1.83| 1.4| 1.67|0      | 1.325204|
+|202 | 2.0|    5|    4| 1.25| 1.0| 1.17|0      | 1.365102|
+|203 | 2.5|    2|    0| 1.92| 1.2| 1.17|1      | 1.688553|
+|203 | 2.5|    2|    1| 1.50| 1.1| 1.17|1      | 1.574516|
+|203 | 2.5|    2|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|203 | 2.5|    2|    4| 1.17| 1.1| 1.00|1      | 1.532414|
+|204 | 2.0|    1|    0| 1.64| 1.1| 1.17|0      | 1.482556|
+|204 | 2.0|    1|    1| 1.58| 1.1| 1.17|0      | 1.359807|
+|204 | 2.0|    1|    3|   NA|  NA|   NA|0      | 1.325204|
+|204 | 2.0|    1|    4| 1.42| 1.3| 1.17|0      | 1.365102|
+|205 | 1.0|    2|    0| 2.25| 1.1| 1.17|0      | 1.482556|
+|205 | 1.0|    2|    1| 1.17| 1.1| 1.00|0      | 1.359807|
+|205 | 1.0|    2|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|205 | 1.0|    2|    4|   NA|  NA|   NA|0      | 1.365102|
+|206 | 2.0|   NA|    0| 2.00| 1.5| 2.00|0      | 1.482556|
+|206 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|206 | 2.0|   NA|    3| 1.50| 1.1| 1.83|0      | 1.325204|
+|206 | 2.0|   NA|    4| 2.58| 1.7| 2.33|0      | 1.365102|
+|207 | 2.0|    0|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|207 | 2.0|    0|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|207 | 2.0|    0|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|207 | 2.0|    0|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|208 | 2.0|    2|    0| 1.42| 1.3| 1.17|0      | 1.482556|
+|208 | 2.0|    2|    1| 1.50| 1.4| 1.33|0      | 1.359807|
+|208 | 2.0|    2|    3| 2.92| 2.1| 1.67|0      | 1.325204|
+|208 | 2.0|    2|    4| 2.58| 2.0| 1.83|0      | 1.365102|
+|209 | 2.0|    1|    0| 1.58| 1.2| 1.33|0      | 1.482556|
+|209 | 2.0|    1|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|209 | 2.0|    1|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|209 | 2.0|    1|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|210 | 2.0|    1|    0| 1.58| 1.1| 2.00|0      | 1.482556|
+|210 | 2.0|    1|    1| 2.08| 1.6| 1.50|0      | 1.359807|
+|210 | 2.0|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|210 | 2.0|    1|    4| 1.42| 1.1| 1.17|0      | 1.365102|
+|211 | 4.0|    4|    0| 3.67| 2.3| 2.50|1      | 1.688553|
+|211 | 4.0|    4|    1| 2.17| 1.6| 1.83|1      | 1.574516|
+|211 | 4.0|    4|    3| 2.42| 1.8| 1.50|1      | 1.617393|
+|211 | 4.0|    4|    4| 2.58| 1.7| 2.33|1      | 1.532414|
+|212 | 1.5|    0|    0| 1.42| 1.1| 1.33|0      | 1.482556|
+|212 | 1.5|    0|    1| 1.50| 1.2| 1.17|0      | 1.359807|
+|212 | 1.5|    0|    3| 1.33| 1.2| 1.67|0      | 1.325204|
+|212 | 1.5|    0|    4| 1.25| 1.1| 1.83|0      | 1.365102|
+|213 | 4.0|    0|    0| 2.58| 2.0| 2.33|1      | 1.688553|
+|213 | 4.0|    0|    1| 3.33| 2.4| 2.17|1      | 1.574516|
+|213 | 4.0|    0|    3| 2.75| 2.5| 1.50|1      | 1.617393|
+|213 | 4.0|    0|    4| 2.25| 2.4| 1.33|1      | 1.532414|
+|214 | 1.5|    0|    0| 1.00| 1.0| 1.00|0      | 1.482556|
+|214 | 1.5|    0|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|214 | 1.5|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|214 | 1.5|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|215 | 3.0|    0|    0| 1.50| 1.4| 1.50|1      | 1.688553|
+|215 | 3.0|    0|    1| 1.25| 1.1| 1.50|1      | 1.574516|
+|215 | 3.0|    0|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|215 | 3.0|    0|    4| 1.00| 1.0| 1.17|1      | 1.532414|
+|216 | 3.0|    0|    0| 1.33| 1.1| 1.33|1      | 1.688553|
+|216 | 3.0|    0|    1| 1.42| 1.8| 1.33|1      | 1.574516|
+|216 | 3.0|    0|    3| 1.25| 1.2| 1.17|1      | 1.617393|
+|216 | 3.0|    0|    4| 1.00| 1.1| 1.17|1      | 1.532414|
+|217 | 3.0|    1|    0| 1.25| 1.0| 1.33|1      | 1.688553|
+|217 | 3.0|    1|    1| 1.17| 1.0| 1.17|1      | 1.574516|
+|217 | 3.0|    1|    3| 1.17| 1.0| 1.33|1      | 1.617393|
+|217 | 3.0|    1|    4| 1.17| 1.0| 1.17|1      | 1.532414|
+|218 | 1.5|    2|    0| 1.33| 1.2| 1.00|0      | 1.482556|
+|218 | 1.5|    2|    1| 1.25| 1.1| 1.17|0      | 1.359807|
+|218 | 1.5|    2|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|218 | 1.5|    2|    4| 1.08| 1.2| 1.00|0      | 1.365102|
+|219 | 3.0|    0|    0| 2.08| 2.3| 2.17|1      | 1.688553|
+|219 | 3.0|    0|    1| 1.92| 1.8| 2.33|1      | 1.574516|
+|219 | 3.0|    0|    3| 1.92| 1.7| 1.83|1      | 1.617393|
+|219 | 3.0|    0|    4| 1.50| 1.3| 1.33|1      | 1.532414|
+|220 | 3.5|    3|    0| 2.17| 1.5| 1.83|1      | 1.688553|
+|220 | 3.5|    3|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|220 | 3.5|    3|    3| 1.08| 1.1| 1.33|1      | 1.617393|
+|220 | 3.5|    3|    4| 1.00| 1.1| 1.17|1      | 1.532414|
+|221 | 4.0|    1|    0| 2.83| 1.9| 1.50|1      | 1.688553|
+|221 | 4.0|    1|    1| 1.25| 1.0| 1.17|1      | 1.574516|
+|221 | 4.0|    1|    3| 1.50| 1.3| 1.17|1      | 1.617393|
+|221 | 4.0|    1|    4| 1.42| 1.8| 1.33|1      | 1.532414|
+|222 | 3.0|    1|    0| 1.58| 1.1| 1.17|1      | 1.688553|
+|222 | 3.0|    1|    1| 1.25| 1.1| 1.17|1      | 1.574516|
+|222 | 3.0|    1|    3| 1.17| 1.2| 1.00|1      | 1.617393|
+|222 | 3.0|    1|    4| 1.00| 1.1| 1.00|1      | 1.532414|
+|223 | 2.0|    1|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|223 | 2.0|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|223 | 2.0|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|223 | 2.0|    1|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|224 | 1.0|    1|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|224 | 1.0|    1|    1| 1.25| 1.0| 1.00|0      | 1.359807|
+|224 | 1.0|    1|    3| 1.17| 1.1| 1.00|0      | 1.325204|
+|224 | 1.0|    1|    4| 1.17| 1.0| 1.00|0      | 1.365102|
+|225 | 2.5|    2|    0| 1.08| 1.0| 1.17|1      | 1.688553|
+|225 | 2.5|    2|    1| 1.42| 1.2| 1.17|1      | 1.574516|
+|225 | 2.5|    2|    3| 1.92| 2.5| 1.67|1      | 1.617393|
+|225 | 2.5|    2|    4| 1.33| 1.2| 1.17|1      | 1.532414|
+|226 | 1.5|    0|    0| 2.08| 1.1| 1.00|0      | 1.482556|
+|226 | 1.5|    0|    1| 2.92| 2.1| 1.67|0      | 1.359807|
+|226 | 1.5|    0|    3| 2.00| 1.1| 1.50|0      | 1.325204|
+|226 | 1.5|    0|    4| 2.83| 2.9| 1.83|0      | 1.365102|
+|227 | 2.0|    0|    0| 1.67| 1.3| 1.17|0      | 1.482556|
+|227 | 2.0|    0|    1| 1.42| 1.3| 1.17|0      | 1.359807|
+|227 | 2.0|    0|    3| 1.17| 1.0| 1.17|0      | 1.325204|
+|227 | 2.0|    0|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|228 | 2.5|    2|    0| 1.33| 1.1| 1.00|1      | 1.688553|
+|228 | 2.5|    2|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|228 | 2.5|    2|    3| 1.00| 1.0| 1.17|1      | 1.617393|
+|228 | 2.5|    2|    4| 1.00| 1.1| 1.17|1      | 1.532414|
+|229 | 3.0|    1|    0| 2.33| 1.8| 1.50|1      | 1.688553|
+|229 | 3.0|    1|    1| 1.25| 1.3| 1.50|1      | 1.574516|
+|229 | 3.0|    1|    3| 2.33| 1.7| 1.17|1      | 1.617393|
+|229 | 3.0|    1|    4| 1.00| 1.2| 1.17|1      | 1.532414|
+|230 | 2.0|    1|    0| 1.67| 1.1| 1.00|0      | 1.482556|
+|230 | 2.0|    1|    1| 1.42| 1.1| 1.17|0      | 1.359807|
+|230 | 2.0|    1|    3| 1.17| 1.0| 1.17|0      | 1.325204|
+|230 | 2.0|    1|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|231 | 1.5|    2|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|231 | 1.5|    2|    1| 1.25| 1.2| 1.17|0      | 1.359807|
+|231 | 1.5|    2|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|231 | 1.5|    2|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|232 | 2.0|    1|    0| 1.08| 1.1| 1.33|0      | 1.482556|
+|232 | 2.0|    1|    1| 1.25| 1.2| 1.33|0      | 1.359807|
+|232 | 2.0|    1|    3| 1.33| 1.3| 1.67|0      | 1.325204|
+|232 | 2.0|    1|    4| 1.42| 1.2| 1.17|0      | 1.365102|
+|233 | 1.0|   NA|    0| 1.08| 1.5| 1.17|0      | 1.482556|
+|233 | 1.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|233 | 1.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|233 | 1.0|   NA|    4| 1.00| 1.1| 1.00|0      | 1.365102|
+|234 | 2.5|    0|    0| 2.08| 2.3| 1.17|1      | 1.688553|
+|234 | 2.5|    0|    1| 1.83| 1.8| 1.50|1      | 1.574516|
+|234 | 2.5|    0|    3| 2.17| 1.6| 1.50|1      | 1.617393|
+|234 | 2.5|    0|    4| 2.17| 1.8| 2.17|1      | 1.532414|
+|235 | 3.0|    2|    0| 1.67| 1.2| 1.33|1      | 1.688553|
+|235 | 3.0|    2|    1| 1.92| 2.2| 1.17|1      | 1.574516|
+|235 | 3.0|    2|    3| 1.25| 1.1| 1.00|1      | 1.617393|
+|235 | 3.0|    2|    4| 1.42| 1.1| 1.00|1      | 1.532414|
+|236 | 2.5|    0|    0| 1.17| 1.1| 1.00|1      | 1.688553|
+|236 | 2.5|    0|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|236 | 2.5|    0|    3| 1.00| 1.1| 1.17|1      | 1.617393|
+|236 | 2.5|    0|    4|   NA|  NA|   NA|1      | 1.532414|
+|237 | 2.0|    0|    0| 1.58| 1.4| 1.67|0      | 1.482556|
+|237 | 2.0|    0|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|237 | 2.0|    0|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|237 | 2.0|    0|    4| 1.83| 1.2| 1.33|0      | 1.365102|
+|238 | 1.0|    2|    0| 1.50| 1.6| 1.17|0      | 1.482556|
+|238 | 1.0|    2|    1| 1.33| 1.4| 1.17|0      | 1.359807|
+|238 | 1.0|    2|    3| 1.67| 1.7| 1.33|0      | 1.325204|
+|238 | 1.0|    2|    4| 1.58| 1.8| 1.33|0      | 1.365102|
+|239 | 2.5|    1|    0| 2.92| 1.1| 1.33|1      | 1.688553|
+|239 | 2.5|    1|    1| 1.25| 1.1| 1.17|1      | 1.574516|
+|239 | 2.5|    1|    3| 1.50| 1.1| 1.17|1      | 1.617393|
+|239 | 2.5|    1|    4| 2.00| 1.1| 1.50|1      | 1.532414|
+|240 | 1.0|    0|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|240 | 1.0|    0|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|240 | 1.0|    0|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|240 | 1.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|241 | 2.5|    3|    0| 2.08| 1.5| 1.17|1      | 1.688553|
+|241 | 2.5|    3|    1| 2.33| 1.3| 1.33|1      | 1.574516|
+|241 | 2.5|    3|    3| 1.33| 1.1| 1.17|1      | 1.617393|
+|241 | 2.5|    3|    4| 1.75| 1.2| 1.17|1      | 1.532414|
+|242 | 1.5|    0|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|242 | 1.5|    0|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|242 | 1.5|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|242 | 1.5|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|243 | 2.0|    4|    0| 1.83| 1.9| 2.17|0      | 1.482556|
+|243 | 2.0|    4|    1| 1.67| 1.5| 1.17|0      | 1.359807|
+|243 | 2.0|    4|    3| 1.83| 1.4| 2.17|0      | 1.325204|
+|243 | 2.0|    4|    4| 1.75| 1.5| 1.83|0      | 1.365102|
+|244 | 2.5|    3|    0| 1.25| 1.2| 1.00|1      | 1.688553|
+|244 | 2.5|    3|    1| 1.17| 1.2| 1.17|1      | 1.574516|
+|244 | 2.5|    3|    3| 1.08| 1.1| 1.17|1      | 1.617393|
+|244 | 2.5|    3|    4| 1.17| 1.0| 1.17|1      | 1.532414|
+|245 | 1.0|    0|    0| 1.00| 1.0| 1.17|0      | 1.482556|
+|245 | 1.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|245 | 1.0|    0|    3| 1.33| 1.1| 1.17|0      | 1.325204|
+|245 | 1.0|    0|    4| 1.58| 1.2| 1.17|0      | 1.365102|
+|246 | 3.0|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|246 | 3.0|    0|    1| 1.00| 1.0| 1.17|1      | 1.574516|
+|246 | 3.0|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|246 | 3.0|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|247 | 2.0|    2|    0| 1.75| 1.2| 1.00|0      | 1.482556|
+|247 | 2.0|    2|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|247 | 2.0|    2|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|247 | 2.0|    2|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|248 | 3.0|    1|    0| 2.17| 1.6| 1.67|1      | 1.688553|
+|248 | 3.0|    1|    1| 2.00| 2.4| 1.33|1      | 1.574516|
+|248 | 3.0|    1|    3| 2.42| 1.8| 1.83|1      | 1.617393|
+|248 | 3.0|    1|    4| 1.50| 1.6| 1.17|1      | 1.532414|
+|249 | 2.0|    1|    0| 1.25| 1.2| 1.17|0      | 1.482556|
+|249 | 2.0|    1|    1| 1.33| 1.1| 1.17|0      | 1.359807|
+|249 | 2.0|    1|    3| 1.42| 1.1| 1.17|0      | 1.325204|
+|249 | 2.0|    1|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|250 | 1.0|    2|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|250 | 1.0|    2|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|250 | 1.0|    2|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|250 | 1.0|    2|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|251 | 2.5|    0|    0| 1.42| 1.0| 1.33|1      | 1.688553|
+|251 | 2.5|    0|    1| 1.17| 1.0| 1.17|1      | 1.574516|
+|251 | 2.5|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|251 | 2.5|    0|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|252 | 1.0|    1|    0| 1.67| 1.6| 1.17|0      | 1.482556|
+|252 | 1.0|    1|    1| 1.58| 1.2| 1.33|0      | 1.359807|
+|252 | 1.0|    1|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|252 | 1.0|    1|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|253 | 2.5|    2|    0| 2.17| 2.9| 2.17|1      | 1.688553|
+|253 | 2.5|    2|    1| 1.83| 1.5| 1.33|1      | 1.574516|
+|253 | 2.5|    2|    3| 1.33| 1.4| 1.17|1      | 1.617393|
+|253 | 2.5|    2|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|254 | 2.5|    3|    0| 2.92| 1.9| 1.50|1      | 1.688553|
+|254 | 2.5|    3|    1| 2.83| 2.8| 2.00|1      | 1.574516|
+|254 | 2.5|    3|    3| 3.33| 2.3| 2.17|1      | 1.617393|
+|254 | 2.5|    3|    4|   NA|  NA|   NA|1      | 1.532414|
+|255 | 2.0|    0|    0| 1.75| 1.3| 1.33|0      | 1.482556|
+|255 | 2.0|    0|    1| 1.25| 1.1| 1.00|0      | 1.359807|
+|255 | 2.0|    0|    3| 1.67| 1.0| 1.33|0      | 1.325204|
+|255 | 2.0|    0|    4| 1.00| 1.0| 1.33|0      | 1.365102|
+|256 | 2.0|    1|    0| 2.50| 1.8| 2.00|0      | 1.482556|
+|256 | 2.0|    1|    1| 1.33| 1.0| 1.17|0      | 1.359807|
+|256 | 2.0|    1|    3| 1.50| 1.2| 1.17|0      | 1.325204|
+|256 | 2.0|    1|    4| 1.33| 1.1| 1.17|0      | 1.365102|
+|257 | 2.5|    0|    0| 1.25| 1.0| 1.33|1      | 1.688553|
+|257 | 2.5|    0|    1| 1.17| 1.0| 1.17|1      | 1.574516|
+|257 | 2.5|    0|    3|   NA|  NA|   NA|1      | 1.617393|
+|257 | 2.5|    0|    4|   NA|  NA|   NA|1      | 1.532414|
+|258 | 1.5|    2|    0| 1.42| 1.5| 1.33|0      | 1.482556|
+|258 | 1.5|    2|    1| 1.50| 1.3| 1.50|0      | 1.359807|
+|258 | 1.5|    2|    3| 1.33| 1.1| 1.17|0      | 1.325204|
+|258 | 1.5|    2|    4| 1.50| 1.2| 1.67|0      | 1.365102|
+|259 | 2.5|    0|    0| 1.08| 1.1| 1.17|1      | 1.688553|
+|259 | 2.5|    0|    1| 1.17| 1.0| 1.00|1      | 1.574516|
+|259 | 2.5|    0|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|259 | 2.5|    0|    4| 1.17| 1.0| 1.00|1      | 1.532414|
+|260 | 2.5|    1|    0| 2.00| 2.0| 1.83|1      | 1.688553|
+|260 | 2.5|    1|    1| 1.42| 1.8| 1.33|1      | 1.574516|
+|260 | 2.5|    1|    3| 1.08| 1.3| 1.33|1      | 1.617393|
+|260 | 2.5|    1|    4| 1.17| 1.3| 1.17|1      | 1.532414|
+|261 | 2.5|    0|    0| 1.50| 1.1| 1.50|1      | 1.688553|
+|261 | 2.5|    0|    1| 1.33| 1.2| 1.50|1      | 1.574516|
+|261 | 2.5|    0|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|261 | 2.5|    0|    4| 1.08| 1.0| 1.00|1      | 1.532414|
+|262 | 4.0|    2|    0| 1.17| 1.3| 1.50|1      | 1.688553|
+|262 | 4.0|    2|    1| 1.25| 1.0| 1.00|1      | 1.574516|
+|262 | 4.0|    2|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|262 | 4.0|    2|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|263 | 1.5|    1|    0| 1.33| 1.1| 1.00|0      | 1.482556|
+|263 | 1.5|    1|    1| 1.58| 1.3| 1.33|0      | 1.359807|
+|263 | 1.5|    1|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|263 | 1.5|    1|    4| 1.00| 1.2| 1.17|0      | 1.365102|
+|264 | 4.5|    0|    0| 2.00| 1.6| 2.00|1      | 1.688553|
+|264 | 4.5|    0|    1| 1.33| 1.3| 1.17|1      | 1.574516|
+|264 | 4.5|    0|    3| 1.67| 1.2| 1.17|1      | 1.617393|
+|264 | 4.5|    0|    4| 2.17| 1.5| 1.17|1      | 1.532414|
+|265 | 2.0|    1|    0| 1.17| 1.2| 1.17|0      | 1.482556|
+|265 | 2.0|    1|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|265 | 2.0|    1|    3| 1.33| 1.2| 1.17|0      | 1.325204|
+|265 | 2.0|    1|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|266 | 2.0|    5|    0| 1.75| 1.2| 1.17|0      | 1.482556|
+|266 | 2.0|    5|    1| 1.25| 1.1| 1.33|0      | 1.359807|
+|266 | 2.0|    5|    3| 1.25| 1.0| 1.00|0      | 1.325204|
+|266 | 2.0|    5|    4|   NA|  NA|   NA|0      | 1.365102|
+|267 | 1.0|   NA|    0| 1.17| 1.1| 1.17|0      | 1.482556|
+|267 | 1.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|267 | 1.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|267 | 1.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|268 | 1.5|    4|    0| 1.42| 1.6| 1.67|0      | 1.482556|
+|268 | 1.5|    4|    1| 1.33| 1.2| 1.00|0      | 1.359807|
+|268 | 1.5|    4|    3| 1.67| 1.2| 1.17|0      | 1.325204|
+|268 | 1.5|    4|    4|   NA|  NA|   NA|0      | 1.365102|
+|269 | 3.0|    1|    0| 1.50| 1.2| 1.33|1      | 1.688553|
+|269 | 3.0|    1|    1| 1.25| 1.2| 1.33|1      | 1.574516|
+|269 | 3.0|    1|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|269 | 3.0|    1|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|270 | 1.5|    1|    0| 1.00| 1.0| 1.00|0      | 1.482556|
+|270 | 1.5|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|270 | 1.5|    1|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|270 | 1.5|    1|    4| 1.25| 1.0| 1.17|0      | 1.365102|
+|271 | 2.5|    0|    0| 1.50| 1.0| 1.17|1      | 1.688553|
+|271 | 2.5|    0|    1| 1.00| 1.0| 1.33|1      | 1.574516|
+|271 | 2.5|    0|    3| 1.25| 1.0| 1.17|1      | 1.617393|
+|271 | 2.5|    0|    4| 1.42| 1.1| 1.00|1      | 1.532414|
+|272 | 1.0|    1|    0| 1.42| 1.0| 2.00|0      | 1.482556|
+|272 | 1.0|    1|    1| 1.25| 1.2| 1.33|0      | 1.359807|
+|272 | 1.0|    1|    3| 1.08| 1.0| 1.33|0      | 1.325204|
+|272 | 1.0|    1|    4| 1.08| 1.2| 1.33|0      | 1.365102|
+|273 | 2.0|    0|    0| 1.67| 1.2| 1.17|0      | 1.482556|
+|273 | 2.0|    0|    1| 1.33| 1.2| 1.17|0      | 1.359807|
+|273 | 2.0|    0|    3| 1.58| 1.4| 1.00|0      | 1.325204|
+|273 | 2.0|    0|    4| 1.67| 1.5| 1.17|0      | 1.365102|
+|274 | 1.0|    0|    0| 1.25| 1.2| 1.17|0      | 1.482556|
+|274 | 1.0|    0|    1| 1.17| 1.2| 1.17|0      | 1.359807|
+|274 | 1.0|    0|    3| 1.33| 1.3| 1.17|0      | 1.325204|
+|274 | 1.0|    0|    4| 1.33| 1.2| 1.17|0      | 1.365102|
+|275 | 2.0|    0|    0| 1.50| 1.0| 1.50|0      | 1.482556|
+|275 | 2.0|    0|    1| 1.33| 1.0| 1.17|0      | 1.359807|
+|275 | 2.0|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|275 | 2.0|    0|    4| 1.33| 1.0| 1.00|0      | 1.365102|
+|276 | 2.0|    3|    0| 1.67| 1.1| 1.17|0      | 1.482556|
+|276 | 2.0|    3|    1| 1.42| 1.1| 1.17|0      | 1.359807|
+|276 | 2.0|    3|    3| 1.92| 1.1| 1.33|0      | 1.325204|
+|276 | 2.0|    3|    4| 1.33| 1.2| 1.17|0      | 1.365102|
+|277 | 3.0|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|277 | 3.0|    0|    1| 1.08| 1.1| 1.17|1      | 1.574516|
+|277 | 3.0|    0|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|277 | 3.0|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|278 | 2.5|    0|    0| 1.17| 1.3| 1.00|1      | 1.688553|
+|278 | 2.5|    0|    1| 1.33| 1.2| 1.33|1      | 1.574516|
+|278 | 2.5|    0|    3|   NA|  NA|   NA|1      | 1.617393|
+|278 | 2.5|    0|    4| 1.42| 1.0| 1.50|1      | 1.532414|
+|279 | 2.0|    2|    0| 1.33| 1.0| 1.17|0      | 1.482556|
+|279 | 2.0|    2|    1| 1.42| 1.0| 1.50|0      | 1.359807|
+|279 | 2.0|    2|    3| 1.25| 1.1| 1.50|0      | 1.325204|
+|279 | 2.0|    2|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|280 | 2.0|    1|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|280 | 2.0|    1|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|280 | 2.0|    1|    3|   NA|  NA|   NA|0      | 1.325204|
+|280 | 2.0|    1|    4|   NA|  NA|   NA|0      | 1.365102|
+|281 | 3.0|    1|    0| 1.17| 1.2| 1.00|1      | 1.688553|
+|281 | 3.0|    1|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|281 | 3.0|    1|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|281 | 3.0|    1|    4| 1.08| 1.0| 1.00|1      | 1.532414|
+|282 | 3.5|    2|    0| 2.08| 2.2| 1.67|1      | 1.688553|
+|282 | 3.5|    2|    1| 1.17| 1.2| 1.17|1      | 1.574516|
+|282 | 3.5|    2|    3| 1.75| 1.3| 1.50|1      | 1.617393|
+|282 | 3.5|    2|    4| 1.17| 1.2| 1.33|1      | 1.532414|
+|283 | 2.5|    7|    0| 2.92| 2.6| 2.67|1      | 1.688553|
+|283 | 2.5|    7|    1| 1.58| 1.1| 1.50|1      | 1.574516|
+|283 | 2.5|    7|    3| 1.58| 1.3| 1.67|1      | 1.617393|
+|283 | 2.5|    7|    4| 1.25| 1.1| 1.67|1      | 1.532414|
+|284 | 3.0|    2|    0| 1.42| 1.1| 1.33|1      | 1.688553|
+|284 | 3.0|    2|    1| 1.33| 1.3| 1.17|1      | 1.574516|
+|284 | 3.0|    2|    3| 1.25| 1.1| 1.17|1      | 1.617393|
+|284 | 3.0|    2|    4| 1.08| 1.1| 1.17|1      | 1.532414|
+|285 | 1.5|    1|    0| 1.50| 1.3| 1.00|0      | 1.482556|
+|285 | 1.5|    1|    1| 1.25| 1.2| 1.00|0      | 1.359807|
+|285 | 1.5|    1|    3| 1.08| 1.1| 1.00|0      | 1.325204|
+|285 | 1.5|    1|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|286 | 1.0|    0|    0| 1.42| 1.6| 1.83|0      | 1.482556|
+|286 | 1.0|    0|    1| 1.50| 1.0| 2.00|0      | 1.359807|
+|286 | 1.0|    0|    3| 1.08| 2.0| 1.17|0      | 1.325204|
+|286 | 1.0|    0|    4| 1.42| 1.6| 1.17|0      | 1.365102|
+|287 | 2.0|    3|    0| 1.75| 1.1| 1.17|0      | 1.482556|
+|287 | 2.0|    3|    1| 1.25| 1.1| 1.00|0      | 1.359807|
+|287 | 2.0|    3|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|287 | 2.0|    3|    4| 1.42| 1.3| 1.17|0      | 1.365102|
+|288 | 2.0|    0|    0| 1.17| 1.2| 1.50|0      | 1.482556|
+|288 | 2.0|    0|    1| 2.00| 1.4| 1.00|0      | 1.359807|
+|288 | 2.0|    0|    3| 1.33| 1.6| 1.50|0      | 1.325204|
+|288 | 2.0|    0|    4| 1.50| 1.2| 1.33|0      | 1.365102|
+|289 | 3.5|   NA|    0| 2.08| 1.5| 1.50|1      | 1.688553|
+|289 | 3.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|289 | 3.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|289 | 3.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|290 | 1.5|    1|    0| 1.25| 1.0| 1.50|0      | 1.482556|
+|290 | 1.5|    1|    1| 1.42| 1.0| 1.17|0      | 1.359807|
+|290 | 1.5|    1|    3| 2.33| 1.4| 1.33|0      | 1.325204|
+|290 | 1.5|    1|    4| 1.25| 1.2| 1.17|0      | 1.365102|
+|291 | 3.0|    4|    0| 1.50| 1.2| 1.17|1      | 1.688553|
+|291 | 3.0|    4|    1| 1.17| 1.1| 1.50|1      | 1.574516|
+|291 | 3.0|    4|    3| 2.08| 1.6| 1.33|1      | 1.617393|
+|291 | 3.0|    4|    4| 2.42| 1.9| 1.67|1      | 1.532414|
+|292 | 2.0|    0|    0| 1.17| 1.1| 1.00|0      | 1.482556|
+|292 | 2.0|    0|    1| 1.17| 1.0| 1.00|0      | 1.359807|
+|292 | 2.0|    0|    3| 1.17| 1.0| 1.00|0      | 1.325204|
+|292 | 2.0|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|293 | 2.5|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|293 | 2.5|    0|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|293 | 2.5|    0|    3| 1.00| 1.0| 1.17|1      | 1.617393|
+|293 | 2.5|    0|    4| 1.00| 1.0| 1.00|1      | 1.532414|
+|294 | 3.0|    2|    0| 1.33| 1.3| 1.17|1      | 1.688553|
+|294 | 3.0|    2|    1| 1.75| 1.5| 1.17|1      | 1.574516|
+|294 | 3.0|    2|    3| 1.33| 1.1| 1.33|1      | 1.617393|
+|294 | 3.0|    2|    4| 1.50| 1.2| 1.50|1      | 1.532414|
+|295 | 1.0|    0|    0| 1.42| 1.3| 1.17|0      | 1.482556|
+|295 | 1.0|    0|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|295 | 1.0|    0|    3| 1.00| 1.2| 1.17|0      | 1.325204|
+|295 | 1.0|    0|    4| 1.08| 1.1| 1.17|0      | 1.365102|
+|296 | 2.0|    3|    0| 1.67| 1.3| 1.50|0      | 1.482556|
+|296 | 2.0|    3|    1| 1.33| 1.3| 1.50|0      | 1.359807|
+|296 | 2.0|    3|    3| 1.33| 1.5| 1.50|0      | 1.325204|
+|296 | 2.0|    3|    4| 1.33| 1.3| 1.50|0      | 1.365102|
+|297 | 3.5|    1|    0| 1.92| 1.1| 1.17|1      | 1.688553|
+|297 | 3.5|    1|    1| 1.50| 1.2| 1.33|1      | 1.574516|
+|297 | 3.5|    1|    3| 1.67| 1.5| 1.17|1      | 1.617393|
+|297 | 3.5|    1|    4| 1.25| 1.1| 1.33|1      | 1.532414|
+|298 | 2.0|    2|    0| 1.17| 1.2| 1.17|0      | 1.482556|
+|298 | 2.0|    2|    1| 1.25| 1.0| 1.00|0      | 1.359807|
+|298 | 2.0|    2|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|298 | 2.0|    2|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|299 | 2.0|    3|    0| 2.67| 3.0| 1.50|0      | 1.482556|
+|299 | 2.0|    3|    1| 2.25| 1.6| 1.50|0      | 1.359807|
+|299 | 2.0|    3|    3| 2.42| 1.6| 1.67|0      | 1.325204|
+|299 | 2.0|    3|    4| 2.50| 1.9| 1.83|0      | 1.365102|
+|300 | 2.0|    0|    0| 2.00| 1.2| 1.17|0      | 1.482556|
+|300 | 2.0|    0|    1| 1.08| 1.2| 1.17|0      | 1.359807|
+|300 | 2.0|    0|    3| 1.33| 1.0| 1.17|0      | 1.325204|
+|300 | 2.0|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|301 | 2.5|    2|    0| 3.33| 2.8| 1.33|1      | 1.688553|
+|301 | 2.5|    2|    1| 3.75| 2.8| 1.67|1      | 1.574516|
+|301 | 2.5|    2|    3| 2.67| 2.0| 1.50|1      | 1.617393|
+|301 | 2.5|    2|    4| 2.08| 2.2| 1.50|1      | 1.532414|
+|302 | 2.0|    0|    0| 1.75| 1.3| 2.00|0      | 1.482556|
+|302 | 2.0|    0|    1| 1.50| 1.9| 2.00|0      | 1.359807|
+|302 | 2.0|    0|    3| 1.25| 1.3| 1.33|0      | 1.325204|
+|302 | 2.0|    0|    4| 1.00| 1.0| 1.33|0      | 1.365102|
+|303 | 2.0|    0|    0| 1.08| 1.1| 1.17|0      | 1.482556|
+|303 | 2.0|    0|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|303 | 2.0|    0|    3|   NA|  NA|   NA|0      | 1.325204|
+|303 | 2.0|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|304 | 3.0|    1|    0| 2.00| 1.2| 1.67|1      | 1.688553|
+|304 | 3.0|    1|    1| 1.25| 1.0| 1.17|1      | 1.574516|
+|304 | 3.0|    1|    3| 1.58| 1.1| 1.33|1      | 1.617393|
+|304 | 3.0|    1|    4| 1.33| 1.0| 1.17|1      | 1.532414|
+|305 | 1.0|    2|    0| 1.25| 1.2| 1.00|0      | 1.482556|
+|305 | 1.0|    2|    1| 1.17| 1.3| 1.17|0      | 1.359807|
+|305 | 1.0|    2|    3| 1.33| 1.0| 1.17|0      | 1.325204|
+|305 | 1.0|    2|    4| 2.17| 1.1| 1.33|0      | 1.365102|
+|306 | 2.0|    0|    0| 1.67| 1.5| 1.17|0      | 1.482556|
+|306 | 2.0|    0|    1| 1.75| 1.7| 1.17|0      | 1.359807|
+|306 | 2.0|    0|    3| 1.50| 1.3| 1.17|0      | 1.325204|
+|306 | 2.0|    0|    4| 1.33| 1.3| 1.17|0      | 1.365102|
+|307 | 1.5|    2|    0| 1.92| 1.6| 1.50|0      | 1.482556|
+|307 | 1.5|    2|    1| 1.25| 1.6| 1.00|0      | 1.359807|
+|307 | 1.5|    2|    3| 1.17| 1.4| 1.17|0      | 1.325204|
+|307 | 1.5|    2|    4| 1.33| 1.1| 1.33|0      | 1.365102|
+|308 | 1.0|    3|    0| 1.25| 1.1| 1.17|0      | 1.482556|
+|308 | 1.0|    3|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|308 | 1.0|    3|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|308 | 1.0|    3|    4| 2.08| 2.5| 1.17|0      | 1.365102|
+|309 | 1.5|    1|    0| 1.25| 1.2| 1.50|0      | 1.482556|
+|309 | 1.5|    1|    1| 1.25| 1.2| 1.50|0      | 1.359807|
+|309 | 1.5|    1|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|309 | 1.5|    1|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|310 | 2.0|    0|    0| 1.42| 1.1| 1.33|0      | 1.482556|
+|310 | 2.0|    0|    1| 1.17| 1.2| 1.33|0      | 1.359807|
+|310 | 2.0|    0|    3| 1.17| 1.2| 1.00|0      | 1.325204|
+|310 | 2.0|    0|    4| 1.17| 1.2| 1.33|0      | 1.365102|
+|311 | 2.0|    2|    0| 1.58| 1.3| 2.00|0      | 1.482556|
+|311 | 2.0|    2|    1| 1.42| 1.2| 1.33|0      | 1.359807|
+|311 | 2.0|    2|    3| 1.25| 1.2| 1.50|0      | 1.325204|
+|311 | 2.0|    2|    4| 1.17| 1.2| 1.17|0      | 1.365102|
+|312 | 2.5|    2|    0| 2.67| 1.5| 1.17|1      | 1.688553|
+|312 | 2.5|    2|    1| 3.67| 1.4| 1.17|1      | 1.574516|
+|312 | 2.5|    2|    3| 4.25| 1.7| 1.17|1      | 1.617393|
+|312 | 2.5|    2|    4| 3.75| 1.9| 1.17|1      | 1.532414|
+|313 | 1.5|    1|    0| 1.75| 1.8| 1.33|0      | 1.482556|
+|313 | 1.5|    1|    1| 2.42| 1.1| 1.33|0      | 1.359807|
+|313 | 1.5|    1|    3| 1.75| 1.4| 2.17|0      | 1.325204|
+|313 | 1.5|    1|    4| 3.25| 1.6| 2.00|0      | 1.365102|
+|314 | 1.0|    0|    0| 1.00| 1.1| 1.00|0      | 1.482556|
+|314 | 1.0|    0|    1| 1.08| 1.1| 1.17|0      | 1.359807|
+|314 | 1.0|    0|    3| 1.08| 1.1| 1.00|0      | 1.325204|
+|314 | 1.0|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|315 | 3.0|    2|    0| 1.17| 1.2| 1.50|1      | 1.688553|
+|315 | 3.0|    2|    1| 1.25| 1.0| 1.33|1      | 1.574516|
+|315 | 3.0|    2|    3| 1.25| 1.0| 1.50|1      | 1.617393|
+|315 | 3.0|    2|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|316 | 2.0|    0|    0| 1.58| 1.1| 1.17|0      | 1.482556|
+|316 | 2.0|    0|    1| 2.08| 2.1| 1.50|0      | 1.359807|
+|316 | 2.0|    0|    3| 1.67| 1.3| 1.67|0      | 1.325204|
+|316 | 2.0|    0|    4| 1.50| 1.0| 1.00|0      | 1.365102|
+|317 | 3.0|    1|    0| 1.42| 1.2| 1.17|1      | 1.688553|
+|317 | 3.0|    1|    1| 2.08| 1.2| 1.17|1      | 1.574516|
+|317 | 3.0|    1|    3| 1.67| 1.3| 1.33|1      | 1.617393|
+|317 | 3.0|    1|    4| 1.42| 1.1| 1.50|1      | 1.532414|
+|318 | 2.0|    1|    0| 1.58| 1.1| 1.17|0      | 1.482556|
+|318 | 2.0|    1|    1| 1.33| 1.0| 1.17|0      | 1.359807|
+|318 | 2.0|    1|    3| 1.17| 1.3| 1.00|0      | 1.325204|
+|318 | 2.0|    1|    4| 1.00| 1.1| 1.17|0      | 1.365102|
+|319 | 2.5|    1|    0| 1.58| 2.2| 1.00|1      | 1.688553|
+|319 | 2.5|    1|    1| 1.25| 1.0| 1.00|1      | 1.574516|
+|319 | 2.5|    1|    3| 1.42| 1.5| 1.17|1      | 1.617393|
+|319 | 2.5|    1|    4| 1.25| 1.0| 1.00|1      | 1.532414|
+|320 | 2.5|    2|    0| 1.42| 1.3| 1.33|1      | 1.688553|
+|320 | 2.5|    2|    1| 1.42| 1.2| 1.33|1      | 1.574516|
+|320 | 2.5|    2|    3| 2.00| 1.3| 1.67|1      | 1.617393|
+|320 | 2.5|    2|    4| 1.58| 1.2| 1.50|1      | 1.532414|
+|321 | 2.0|    0|    0| 1.83| 1.5| 1.83|0      | 1.482556|
+|321 | 2.0|    0|    1| 1.33| 1.8| 1.17|0      | 1.359807|
+|321 | 2.0|    0|    3| 1.33| 1.4| 1.17|0      | 1.325204|
+|321 | 2.0|    0|    4| 1.08| 1.6| 1.17|0      | 1.365102|
+|322 | 3.0|    0|    0| 1.75| 1.1| 1.33|1      | 1.688553|
+|322 | 3.0|    0|    1| 2.08| 1.0| 1.33|1      | 1.574516|
+|322 | 3.0|    0|    3| 1.33| 1.0| 1.17|1      | 1.617393|
+|322 | 3.0|    0|    4| 1.42| 1.0| 1.00|1      | 1.532414|
+|323 | 3.5|    0|    0| 1.42| 1.2| 1.50|1      | 1.688553|
+|323 | 3.5|    0|    1| 1.67| 1.4| 1.83|1      | 1.574516|
+|323 | 3.5|    0|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|323 | 3.5|    0|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|324 | 5.0|    1|    0| 1.67| 1.0| 1.67|1      | 1.688553|
+|324 | 5.0|    1|    1| 1.42| 1.2| 1.17|1      | 1.574516|
+|324 | 5.0|    1|    3|   NA|  NA|   NA|1      | 1.617393|
+|324 | 5.0|    1|    4| 1.17| 1.1| 1.00|1      | 1.532414|
+|325 | 1.0|    2|    0| 1.50| 1.2| 1.17|0      | 1.482556|
+|325 | 1.0|    2|    1| 1.42| 1.4| 1.17|0      | 1.359807|
+|325 | 1.0|    2|    3| 1.25| 1.3| 1.17|0      | 1.325204|
+|325 | 1.0|    2|    4| 1.67| 1.4| 1.17|0      | 1.365102|
+|326 | 2.5|    3|    0| 1.75| 1.2| 1.50|1      | 1.688553|
+|326 | 2.5|    3|    1| 1.50| 1.0| 1.17|1      | 1.574516|
+|326 | 2.5|    3|    3| 2.25| 1.0| 1.50|1      | 1.617393|
+|326 | 2.5|    3|    4| 3.00| 1.0| 1.33|1      | 1.532414|
+|327 | 3.5|    1|    0| 1.00| 1.2| 1.17|1      | 1.688553|
+|327 | 3.5|    1|    1| 1.08| 1.1| 1.00|1      | 1.574516|
+|327 | 3.5|    1|    3| 1.00| 1.0| 1.00|1      | 1.617393|
+|327 | 3.5|    1|    4|   NA|  NA|   NA|1      | 1.532414|
+|328 | 2.0|    0|    0| 1.25| 1.0| 1.17|0      | 1.482556|
+|328 | 2.0|    0|    1| 1.08| 1.0| 1.33|0      | 1.359807|
+|328 | 2.0|    0|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|328 | 2.0|    0|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|329 | 1.0|    1|    0| 1.00| 1.1| 1.17|0      | 1.482556|
+|329 | 1.0|    1|    1| 1.33| 1.2| 1.33|0      | 1.359807|
+|329 | 1.0|    1|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|329 | 1.0|    1|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|330 | 1.0|    1|    0| 1.33| 1.0| 1.17|0      | 1.482556|
+|330 | 1.0|    1|    1| 1.17| 1.0| 1.17|0      | 1.359807|
+|330 | 1.0|    1|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|330 | 1.0|    1|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|331 | 2.0|    2|    0| 1.33| 1.1| 1.67|0      | 1.482556|
+|331 | 2.0|    2|    1| 1.25| 1.0| 1.33|0      | 1.359807|
+|331 | 2.0|    2|    3| 1.50| 1.1| 1.50|0      | 1.325204|
+|331 | 2.0|    2|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|332 | 2.0|    1|    0| 1.08| 1.1| 1.00|0      | 1.482556|
+|332 | 2.0|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|332 | 2.0|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|332 | 2.0|    1|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|333 | 1.0|    0|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|333 | 1.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|333 | 1.0|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|333 | 1.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|334 | 2.5|    1|    0| 2.83| 2.4| 2.50|1      | 1.688553|
+|334 | 2.5|    1|    1| 2.50| 2.4| 2.33|1      | 1.574516|
+|334 | 2.5|    1|    3| 1.92| 1.7| 2.00|1      | 1.617393|
+|334 | 2.5|    1|    4| 1.50| 2.1| 1.17|1      | 1.532414|
+|335 | 3.0|    0|    0| 1.00| 1.0| 1.33|1      | 1.688553|
+|335 | 3.0|    0|    1| 1.25| 1.0| 1.17|1      | 1.574516|
+|335 | 3.0|    0|    3| 1.00| 1.1| 1.17|1      | 1.617393|
+|335 | 3.0|    0|    4| 1.33| 1.3| 1.50|1      | 1.532414|
+|336 | 2.0|    2|    0| 2.00| 1.3| 1.17|0      | 1.482556|
+|336 | 2.0|    2|    1| 2.67| 2.0| 1.50|0      | 1.359807|
+|336 | 2.0|    2|    3| 1.08| 1.1| 1.17|0      | 1.325204|
+|336 | 2.0|    2|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|337 | 2.5|    1|    0| 1.50| 1.0| 1.17|1      | 1.688553|
+|337 | 2.5|    1|    1| 1.08| 1.0| 1.00|1      | 1.574516|
+|337 | 2.5|    1|    3| 1.25| 1.0| 1.17|1      | 1.617393|
+|337 | 2.5|    1|    4| 1.17| 1.1| 1.17|1      | 1.532414|
+|338 | 2.0|    3|    0| 1.42| 1.1| 1.67|0      | 1.482556|
+|338 | 2.0|    3|    1| 1.25| 1.0| 1.33|0      | 1.359807|
+|338 | 2.0|    3|    3| 1.25| 1.2| 1.17|0      | 1.325204|
+|338 | 2.0|    3|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|339 | 2.0|    0|    0| 1.83| 1.3| 1.33|0      | 1.482556|
+|339 | 2.0|    0|    1| 1.58| 1.1| 1.17|0      | 1.359807|
+|339 | 2.0|    0|    3| 1.42| 1.0| 1.00|0      | 1.325204|
+|339 | 2.0|    0|    4| 1.83| 1.1| 1.17|0      | 1.365102|
+|340 | 1.5|    0|    0| 1.25| 1.0| 1.33|0      | 1.482556|
+|340 | 1.5|    0|    1| 1.50| 1.2| 1.17|0      | 1.359807|
+|340 | 1.5|    0|    3| 1.17| 1.0| 1.17|0      | 1.325204|
+|340 | 1.5|    0|    4| 1.42| 1.0| 1.17|0      | 1.365102|
+|341 | 2.5|    0|    0| 1.00| 1.0| 1.00|1      | 1.688553|
+|341 | 2.5|    0|    1| 1.17| 1.2| 1.00|1      | 1.574516|
+|341 | 2.5|    0|    3| 1.58| 1.3| 1.67|1      | 1.617393|
+|341 | 2.5|    0|    4| 1.83| 1.5| 1.67|1      | 1.532414|
+|342 | 2.0|    0|    0| 2.00| 1.3| 1.33|0      | 1.482556|
+|342 | 2.0|    0|    1| 1.75| 1.4| 1.33|0      | 1.359807|
+|342 | 2.0|    0|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|342 | 2.0|    0|    4| 1.33| 1.1| 1.33|0      | 1.365102|
+|343 | 1.0|    1|    0| 1.17| 1.1| 1.00|0      | 1.482556|
+|343 | 1.0|    1|    1| 1.33| 1.1| 1.33|0      | 1.359807|
+|343 | 1.0|    1|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|343 | 1.0|    1|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|344 | 5.0|    1|    0| 3.00| 2.7| 2.00|1      | 1.688553|
+|344 | 5.0|    1|    1| 1.58| 2.3| 1.67|1      | 1.574516|
+|344 | 5.0|    1|    3| 3.67| 3.3| 2.33|1      | 1.617393|
+|344 | 5.0|    1|    4| 3.42| 3.7| 2.67|1      | 1.532414|
+|345 | 1.5|    1|    0| 1.67| 2.1| 2.00|0      | 1.482556|
+|345 | 1.5|    1|    1| 1.42| 1.3| 1.17|0      | 1.359807|
+|345 | 1.5|    1|    3| 1.17| 1.2| 1.17|0      | 1.325204|
+|345 | 1.5|    1|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|346 | 3.0|    2|    0| 1.50| 1.1| 1.83|1      | 1.688553|
+|346 | 3.0|    2|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|346 | 3.0|    2|    3| 1.08| 1.0| 1.17|1      | 1.617393|
+|346 | 3.0|    2|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|347 | 1.0|    2|    0| 1.33| 1.1| 1.17|0      | 1.482556|
+|347 | 1.0|    2|    1| 1.25| 2.4| 1.00|0      | 1.359807|
+|347 | 1.0|    2|    3| 1.17| 1.2| 1.00|0      | 1.325204|
+|347 | 1.0|    2|    4| 1.25| 1.2| 1.17|0      | 1.365102|
+|348 | 2.0|   NA|    0| 1.00| 1.0| 1.17|0      | 1.482556|
+|348 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|348 | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|348 | 2.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|349 | 2.5|    1|    0| 1.50| 1.1| 2.17|1      | 1.688553|
+|349 | 2.5|    1|    1| 1.67| 1.0| 2.17|1      | 1.574516|
+|349 | 2.5|    1|    3| 1.75| 1.2| 2.33|1      | 1.617393|
+|349 | 2.5|    1|    4| 1.33| 1.2| 1.67|1      | 1.532414|
+|350 | 2.5|    1|    0| 1.17| 1.0| 1.17|1      | 1.688553|
+|350 | 2.5|    1|    1| 1.67| 1.4| 1.50|1      | 1.574516|
+|350 | 2.5|    1|    3| 1.33| 1.2| 1.50|1      | 1.617393|
+|350 | 2.5|    1|    4| 1.17| 1.1| 1.00|1      | 1.532414|
+|351 | 1.5|    1|    0| 1.17| 1.2| 1.17|0      | 1.482556|
+|351 | 1.5|    1|    1| 1.17| 1.1| 1.00|0      | 1.359807|
+|351 | 1.5|    1|    3| 1.33| 1.2| 1.17|0      | 1.325204|
+|351 | 1.5|    1|    4| 1.50| 1.2| 1.83|0      | 1.365102|
+|352 | 3.0|    4|    0| 1.83| 1.2| 1.50|1      | 1.688553|
+|352 | 3.0|    4|    1| 2.67| 1.4| 1.17|1      | 1.574516|
+|352 | 3.0|    4|    3| 1.25| 1.3| 1.17|1      | 1.617393|
+|352 | 3.0|    4|    4| 1.17| 1.2| 1.17|1      | 1.532414|
+|353 | 2.0|    0|    0| 1.00| 1.0| 1.17|0      | 1.482556|
+|353 | 2.0|    0|    1| 1.00| 1.1| 1.00|0      | 1.359807|
+|353 | 2.0|    0|    3| 1.00| 1.0| 1.33|0      | 1.325204|
+|353 | 2.0|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|354 | 3.0|    1|    0| 1.25| 1.0| 1.17|1      | 1.688553|
+|354 | 3.0|    1|    1| 1.33| 1.0| 1.17|1      | 1.574516|
+|354 | 3.0|    1|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|354 | 3.0|    1|    4| 1.25| 1.0| 1.00|1      | 1.532414|
+|355 | 5.0|    2|    0| 2.42| 1.9| 2.17|1      | 1.688553|
+|355 | 5.0|    2|    1| 2.58| 1.5| 1.67|1      | 1.574516|
+|355 | 5.0|    2|    3| 4.25| 3.3| 3.17|1      | 1.617393|
+|355 | 5.0|    2|    4| 2.50| 2.0| 2.00|1      | 1.532414|
+|356 | 3.5|    3|    0| 2.00| 1.6| 1.67|1      | 1.688553|
+|356 | 3.5|    3|    1| 2.17| 1.5| 1.50|1      | 1.574516|
+|356 | 3.5|    3|    3| 2.75| 1.5| 1.67|1      | 1.617393|
+|356 | 3.5|    3|    4| 2.67| 1.8| 1.83|1      | 1.532414|
+|357 | 3.0|    0|    0| 1.33| 1.2| 1.17|1      | 1.688553|
+|357 | 3.0|    0|    1| 1.42| 1.3| 1.00|1      | 1.574516|
+|357 | 3.0|    0|    3| 1.25| 1.2| 1.00|1      | 1.617393|
+|357 | 3.0|    0|    4| 1.25| 1.1| 1.17|1      | 1.532414|
+|358 | 3.5|    1|    0| 1.58| 1.1| 1.33|1      | 1.688553|
+|358 | 3.5|    1|    1| 1.25| 1.1| 1.17|1      | 1.574516|
+|358 | 3.5|    1|    3| 1.25| 1.1| 1.17|1      | 1.617393|
+|358 | 3.5|    1|    4| 1.50| 1.1| 1.33|1      | 1.532414|
+|359 | 2.0|    1|    0| 1.50| 1.2| 1.33|0      | 1.482556|
+|359 | 2.0|    1|    1| 1.33| 1.3| 1.17|0      | 1.359807|
+|359 | 2.0|    1|    3|   NA|  NA|   NA|0      | 1.325204|
+|359 | 2.0|    1|    4| 1.58| 1.3| 1.50|0      | 1.365102|
+|360 | 1.5|    1|    0| 1.75| 1.3| 1.67|0      | 1.482556|
+|360 | 1.5|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|360 | 1.5|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|360 | 1.5|    1|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|361 | 2.5|    3|    0| 1.92| 1.6| 1.67|1      | 1.688553|
+|361 | 2.5|    3|    1| 1.92| 1.8| 1.50|1      | 1.574516|
+|361 | 2.5|    3|    3| 1.83| 1.8| 1.50|1      | 1.617393|
+|361 | 2.5|    3|    4| 2.00| 2.1| 1.50|1      | 1.532414|
+|362 | 1.0|    0|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|362 | 1.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|362 | 1.0|    0|    3| 1.17| 1.1| 1.17|0      | 1.325204|
+|362 | 1.0|    0|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|363 | 1.5|    1|    0| 3.58| 1.6| 1.83|0      | 1.482556|
+|363 | 1.5|    1|    1| 1.58| 1.4| 1.17|0      | 1.359807|
+|363 | 1.5|    1|    3|   NA|  NA|   NA|0      | 1.325204|
+|363 | 1.5|    1|    4|   NA|  NA|   NA|0      | 1.365102|
+|364 | 3.5|    2|    0| 1.58| 1.6| 1.17|1      | 1.688553|
+|364 | 3.5|    2|    1| 1.42| 1.0| 1.17|1      | 1.574516|
+|364 | 3.5|    2|    3| 1.00| 1.0| 1.17|1      | 1.617393|
+|364 | 3.5|    2|    4| 1.08| 1.0| 1.17|1      | 1.532414|
+|365 | 2.0|    1|    0| 1.67| 1.3| 1.83|0      | 1.482556|
+|365 | 2.0|    1|    1| 2.25| 1.5| 1.50|0      | 1.359807|
+|365 | 2.0|    1|    3| 2.00| 1.4| 1.50|0      | 1.325204|
+|365 | 2.0|    1|    4| 1.92| 1.3| 1.17|0      | 1.365102|
+|366 | 1.0|    3|    0| 1.17| 1.2| 1.17|0      | 1.482556|
+|366 | 1.0|    3|    1| 1.25| 1.1| 1.17|0      | 1.359807|
+|366 | 1.0|    3|    3| 1.00| 1.0| 1.17|0      | 1.325204|
+|366 | 1.0|    3|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|367 | 3.0|    1|    0| 2.83| 2.5| 2.33|1      | 1.688553|
+|367 | 3.0|    1|    1| 2.50| 1.3| 1.50|1      | 1.574516|
+|367 | 3.0|    1|    3| 1.92| 1.2| 1.17|1      | 1.617393|
+|367 | 3.0|    1|    4|   NA|  NA|   NA|1      | 1.532414|
+|368 | 2.0|    3|    0| 1.25| 1.1| 1.17|0      | 1.482556|
+|368 | 2.0|    3|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|368 | 2.0|    3|    3| 1.17| 1.0| 1.00|0      | 1.325204|
+|368 | 2.0|    3|    4| 1.25| 1.0| 1.00|0      | 1.365102|
+|369 | 1.0|    1|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|369 | 1.0|    1|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|369 | 1.0|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|369 | 1.0|    1|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|370 | 2.0|    5|    0| 1.25| 1.1| 1.33|0      | 1.482556|
+|370 | 2.0|    5|    1| 1.08| 1.2| 1.17|0      | 1.359807|
+|370 | 2.0|    5|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|370 | 2.0|    5|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|371 | 2.5|    2|    0| 1.08| 1.2| 1.17|1      | 1.688553|
+|371 | 2.5|    2|    1| 1.25| 1.3| 1.17|1      | 1.574516|
+|371 | 2.5|    2|    3| 1.42| 1.2| 1.17|1      | 1.617393|
+|371 | 2.5|    2|    4| 1.25| 1.0| 1.00|1      | 1.532414|
+|372 | 3.0|    1|    0| 1.58| 1.2| 1.17|1      | 1.688553|
+|372 | 3.0|    1|    1| 1.42| 1.3| 1.50|1      | 1.574516|
+|372 | 3.0|    1|    3| 1.25| 1.3| 1.17|1      | 1.617393|
+|372 | 3.0|    1|    4| 1.25| 1.3| 1.17|1      | 1.532414|
+|373 | 4.0|    2|    0| 3.50| 4.8| 2.83|1      | 1.688553|
+|373 | 4.0|    2|    1| 2.83| 2.8| 2.83|1      | 1.574516|
+|373 | 4.0|    2|    3| 1.75| 1.4| 1.67|1      | 1.617393|
+|373 | 4.0|    2|    4| 1.25| 1.3| 1.83|1      | 1.532414|
+|374 | 2.5|    1|    0| 2.08| 1.3| 1.67|1      | 1.688553|
+|374 | 2.5|    1|    1| 1.67| 1.3| 1.17|1      | 1.574516|
+|374 | 2.5|    1|    3| 1.83| 1.2| 1.83|1      | 1.617393|
+|374 | 2.5|    1|    4| 1.58| 1.2| 1.17|1      | 1.532414|
+|375 | 3.5|    1|    0| 1.83| 1.3| 1.50|1      | 1.688553|
+|375 | 3.5|    1|    1| 1.58| 1.1| 1.17|1      | 1.574516|
+|375 | 3.5|    1|    3| 1.17| 1.1| 1.17|1      | 1.617393|
+|375 | 3.5|    1|    4| 1.50| 1.3| 1.50|1      | 1.532414|
+|376 | 2.5|    1|    0| 1.25| 1.0| 1.33|1      | 1.688553|
+|376 | 2.5|    1|    1| 1.42| 1.0| 1.00|1      | 1.574516|
+|376 | 2.5|    1|    3| 1.17| 1.0| 1.00|1      | 1.617393|
+|376 | 2.5|    1|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|377 | 2.0|   NA|    0| 1.17| 1.5| 1.17|0      | 1.482556|
+|377 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|377 | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|377 | 2.0|   NA|    4| 2.58| 2.1| 1.67|0      | 1.365102|
+|378 | 4.0|    0|    0| 1.58| 1.3| 1.17|1      | 1.688553|
+|378 | 4.0|    0|    1| 1.83| 1.4| 1.17|1      | 1.574516|
+|378 | 4.0|    0|    3| 1.50| 1.0| 1.17|1      | 1.617393|
+|378 | 4.0|    0|    4| 2.00| 1.4| 1.17|1      | 1.532414|
+|379 | 1.5|    1|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|379 | 1.5|    1|    1| 1.42| 1.0| 1.33|0      | 1.359807|
+|379 | 1.5|    1|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|379 | 1.5|    1|    4| 1.08| 1.1| 1.17|0      | 1.365102|
+|380 | 1.5|    3|    0| 1.08| 1.2| 1.17|0      | 1.482556|
+|380 | 1.5|    3|    1| 1.17| 1.1| 1.17|0      | 1.359807|
+|380 | 1.5|    3|    3| 1.25| 1.1| 1.17|0      | 1.325204|
+|380 | 1.5|    3|    4| 1.08| 1.1| 1.17|0      | 1.365102|
+|381 | 3.0|    0|    0| 1.75| 1.1| 1.17|1      | 1.688553|
+|381 | 3.0|    0|    1| 1.33| 1.0| 1.17|1      | 1.574516|
+|381 | 3.0|    0|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|381 | 3.0|    0|    4| 1.17| 1.0| 1.00|1      | 1.532414|
+|382 | 1.0|    0|    0| 1.75| 1.3| 1.83|0      | 1.482556|
+|382 | 1.0|    0|    1| 1.50| 1.2| 1.83|0      | 1.359807|
+|382 | 1.0|    0|    3| 1.33| 1.2| 1.33|0      | 1.325204|
+|382 | 1.0|    0|    4| 1.08| 1.0| 1.17|0      | 1.365102|
+|383 | 3.0|    0|    0| 1.67| 1.3| 1.83|1      | 1.688553|
+|383 | 3.0|    0|    1| 1.17| 1.0| 1.17|1      | 1.574516|
+|383 | 3.0|    0|    3| 1.67| 2.4| 2.17|1      | 1.617393|
+|383 | 3.0|    0|    4|   NA|  NA|   NA|1      | 1.532414|
+|384 | 3.5|   NA|    0| 1.92| 1.5| 1.67|1      | 1.688553|
+|384 | 3.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|384 | 3.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|384 | 3.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|385 | 4.0|    1|    0| 2.00| 1.1| 1.17|1      | 1.688553|
+|385 | 4.0|    1|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|385 | 4.0|    1|    3| 1.25| 1.0| 1.33|1      | 1.617393|
+|385 | 4.0|    1|    4| 1.67| 1.1| 1.67|1      | 1.532414|
+|386 | 2.0|   NA|    0| 2.00| 1.6| 1.67|0      | 1.482556|
+|386 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|386 | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|386 | 2.0|   NA|    4| 1.25| 1.1| 1.17|0      | 1.365102|
+|387 | 2.0|    0|    0| 2.25| 2.1| 1.83|0      | 1.482556|
+|387 | 2.0|    0|    1| 1.08| 1.1| 1.17|0      | 1.359807|
+|387 | 2.0|    0|    3| 1.50| 1.2| 1.17|0      | 1.325204|
+|387 | 2.0|    0|    4| 2.67| 3.1| 1.17|0      | 1.365102|
+|388 | 3.0|    3|    0| 1.33| 1.1| 1.50|1      | 1.688553|
+|388 | 3.0|    3|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|388 | 3.0|    3|    3| 1.17| 1.1| 1.00|1      | 1.617393|
+|388 | 3.0|    3|    4| 1.17| 1.0| 1.00|1      | 1.532414|
+|389 | 3.0|    0|    0| 2.08| 1.2| 1.33|1      | 1.688553|
+|389 | 3.0|    0|    1| 1.67| 1.2| 1.50|1      | 1.574516|
+|389 | 3.0|    0|    3| 1.83| 1.1| 1.17|1      | 1.617393|
+|389 | 3.0|    0|    4| 1.33| 1.1| 1.33|1      | 1.532414|
+|390 | 2.0|    2|    0| 1.67| 1.2| 1.33|0      | 1.482556|
+|390 | 2.0|    2|    1| 1.83| 1.2| 1.33|0      | 1.359807|
+|390 | 2.0|    2|    3|   NA|  NA|   NA|0      | 1.325204|
+|390 | 2.0|    2|    4| 2.00| 1.2| 1.33|0      | 1.365102|
+|391 | 1.5|    0|    0| 1.25| 1.5| 1.17|0      | 1.482556|
+|391 | 1.5|    0|    1| 1.00| 1.0| 1.00|0      | 1.359807|
+|391 | 1.5|    0|    3| 1.36| 1.4| 1.67|0      | 1.325204|
+|391 | 1.5|    0|    4| 1.17| 1.0| 1.33|0      | 1.365102|
+|392 | 1.5|    1|    0| 1.42| 1.0| 1.33|0      | 1.482556|
+|392 | 1.5|    1|    1| 1.42| 1.0| 1.17|0      | 1.359807|
+|392 | 1.5|    1|    3| 1.42| 1.0| 1.00|0      | 1.325204|
+|392 | 1.5|    1|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|393 | 1.5|    3|    0| 1.33| 1.3| 1.17|0      | 1.482556|
+|393 | 1.5|    3|    1| 1.42| 1.2| 1.00|0      | 1.359807|
+|393 | 1.5|    3|    3| 1.17| 1.2| 1.17|0      | 1.325204|
+|393 | 1.5|    3|    4| 1.17| 1.0| 1.17|0      | 1.365102|
+|394 | 3.5|    0|    0| 1.67| 1.4| 1.17|1      | 1.688553|
+|394 | 3.5|    0|    1| 1.33| 1.2| 1.50|1      | 1.574516|
+|394 | 3.5|    0|    3| 1.25| 1.1| 1.50|1      | 1.617393|
+|394 | 3.5|    0|    4| 2.92| 1.8| 1.50|1      | 1.532414|
+|395 | 2.5|    1|    0| 1.67| 1.5| 1.83|1      | 1.688553|
+|395 | 2.5|    1|    1| 1.42| 1.4| 1.67|1      | 1.574516|
+|395 | 2.5|    1|    3| 1.25| 1.2| 1.17|1      | 1.617393|
+|395 | 2.5|    1|    4| 1.33| 1.3| 1.00|1      | 1.532414|
+|396 | 3.0|    3|    0| 1.42| 1.4| 1.33|1      | 1.688553|
+|396 | 3.0|    3|    1| 1.58| 1.3| 1.67|1      | 1.574516|
+|396 | 3.0|    3|    3| 2.08| 1.6| 1.67|1      | 1.617393|
+|396 | 3.0|    3|    4| 1.83| 2.3| 1.83|1      | 1.532414|
+|397 | 2.0|    0|    0| 1.42| 1.0| 1.17|0      | 1.482556|
+|397 | 2.0|    0|    1| 1.33| 1.0| 1.17|0      | 1.359807|
+|397 | 2.0|    0|    3| 1.25| 1.0| 1.00|0      | 1.325204|
+|397 | 2.0|    0|    4| 1.25| 1.0| 1.00|0      | 1.365102|
+|398 | 1.0|    2|    0| 1.25| 1.1| 1.00|0      | 1.482556|
+|398 | 1.0|    2|    1| 1.17| 1.0| 1.00|0      | 1.359807|
+|398 | 1.0|    2|    3| 1.58| 1.4| 1.17|0      | 1.325204|
+|398 | 1.0|    2|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|399 | 3.0|    5|    0| 1.58| 1.7| 1.50|1      | 1.688553|
+|399 | 3.0|    5|    1| 1.58| 1.8| 2.00|1      | 1.574516|
+|399 | 3.0|    5|    3| 1.67| 2.0| 1.83|1      | 1.617393|
+|399 | 3.0|    5|    4| 1.50| 1.6| 1.33|1      | 1.532414|
+|400 | 2.5|   NA|    0| 1.17| 1.5| 1.00|1      | 1.688553|
+|400 | 2.5|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|400 | 2.5|   NA|    3|   NA|  NA|   NA|1      | 1.617393|
+|400 | 2.5|   NA|    4|   NA|  NA|   NA|1      | 1.532414|
+|401 | 2.0|    0|    0| 1.42| 1.2| 1.00|0      | 1.482556|
+|401 | 2.0|    0|    1| 1.17| 1.1| 1.00|0      | 1.359807|
+|401 | 2.0|    0|    3| 1.17| 1.0| 1.00|0      | 1.325204|
+|401 | 2.0|    0|    4| 1.17| 1.1| 1.17|0      | 1.365102|
+|402 | 3.0|    1|    0| 1.33| 1.2| 1.17|1      | 1.688553|
+|402 | 3.0|    1|    1| 1.08| 1.1| 1.17|1      | 1.574516|
+|402 | 3.0|    1|    3| 1.25| 1.0| 1.17|1      | 1.617393|
+|402 | 3.0|    1|    4| 1.25| 1.0| 1.17|1      | 1.532414|
+|403 | 2.0|    1|    0| 2.25| 1.8| 2.00|0      | 1.482556|
+|403 | 2.0|    1|    1| 2.17| 2.0| 1.83|0      | 1.359807|
+|403 | 2.0|    1|    3| 2.42| 2.5| 3.00|0      | 1.325204|
+|403 | 2.0|    1|    4| 1.92| 1.7| 1.83|0      | 1.365102|
+|404 | 3.0|    1|    0| 1.33| 1.1| 1.33|1      | 1.688553|
+|404 | 3.0|    1|    1| 1.17| 1.2| 1.17|1      | 1.574516|
+|404 | 3.0|    1|    3| 1.50| 1.5| 1.17|1      | 1.617393|
+|404 | 3.0|    1|    4| 1.25| 1.4| 1.17|1      | 1.532414|
+|405 | 2.0|    0|    0| 1.08| 1.0| 1.00|0      | 1.482556|
+|405 | 2.0|    0|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|405 | 2.0|    0|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|405 | 2.0|    0|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|406 | 2.0|    3|    0| 1.25| 1.0| 1.83|0      | 1.482556|
+|406 | 2.0|    3|    1| 1.25| 1.0| 1.50|0      | 1.359807|
+|406 | 2.0|    3|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|406 | 2.0|    3|    4| 1.08| 1.1| 1.33|0      | 1.365102|
+|407 | 1.5|    3|    0| 3.08| 2.6| 1.67|0      | 1.482556|
+|407 | 1.5|    3|    1| 2.83| 2.3| 2.00|0      | 1.359807|
+|407 | 1.5|    3|    3| 2.00| 1.8| 1.50|0      | 1.325204|
+|407 | 1.5|    3|    4| 2.08| 1.7| 1.33|0      | 1.365102|
+|408 | 1.0|    2|    0| 1.25| 1.0| 1.00|0      | 1.482556|
+|408 | 1.0|    2|    1| 1.42| 1.2| 1.00|0      | 1.359807|
+|408 | 1.0|    2|    3| 1.08| 1.0| 1.00|0      | 1.325204|
+|408 | 1.0|    2|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|409 | 2.0|    3|    0| 2.67| 1.9| 1.50|0      | 1.482556|
+|409 | 2.0|    3|    1| 1.08| 1.1| 1.17|0      | 1.359807|
+|409 | 2.0|    3|    3|   NA|  NA|   NA|0      | 1.325204|
+|409 | 2.0|    3|    4|   NA|  NA|   NA|0      | 1.365102|
+|410 | 3.0|    0|    0| 1.17| 1.2| 1.00|1      | 1.688553|
+|410 | 3.0|    0|    1| 1.25| 1.1| 1.17|1      | 1.574516|
+|410 | 3.0|    0|    3| 1.00| 1.1| 1.00|1      | 1.617393|
+|410 | 3.0|    0|    4| 2.08| 2.1| 2.17|1      | 1.532414|
+|411 | 2.0|    2|    0| 1.17| 1.0| 1.17|0      | 1.482556|
+|411 | 2.0|    2|    1| 1.17| 1.0| 1.00|0      | 1.359807|
+|411 | 2.0|    2|    3| 1.00| 1.1| 1.17|0      | 1.325204|
+|411 | 2.0|    2|    4| 1.08| 1.0| 1.00|0      | 1.365102|
+|412 | 3.0|    1|    0| 1.50| 1.6| 1.17|1      | 1.688553|
+|412 | 3.0|    1|    1| 1.17| 1.3| 1.00|1      | 1.574516|
+|412 | 3.0|    1|    3| 1.08| 1.2| 1.00|1      | 1.617393|
+|412 | 3.0|    1|    4| 1.08| 1.1| 1.00|1      | 1.532414|
+|413 | 2.0|    0|    0| 1.33| 1.4| 1.17|0      | 1.482556|
+|413 | 2.0|    0|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|413 | 2.0|    0|    3| 1.08| 1.1| 1.00|0      | 1.325204|
+|413 | 2.0|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|414 | 3.0|   NA|    0| 1.42| 1.1| 1.50|1      | 1.688553|
+|414 | 3.0|   NA|    1|   NA|  NA|   NA|1      | 1.574516|
+|414 | 3.0|   NA|    3| 1.33| 1.1| 1.17|1      | 1.617393|
+|414 | 3.0|   NA|    4| 1.08| 1.1| 1.00|1      | 1.532414|
+|415 | 3.5|    1|    0| 1.33| 1.0| 1.33|1      | 1.688553|
+|415 | 3.5|    1|    1| 1.00| 1.0| 1.00|1      | 1.574516|
+|415 | 3.5|    1|    3| 1.08| 1.0| 1.00|1      | 1.617393|
+|415 | 3.5|    1|    4| 1.17| 1.0| 1.00|1      | 1.532414|
+|416 | 1.0|    2|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|416 | 1.0|    2|    1| 1.08| 1.0| 1.00|0      | 1.359807|
+|416 | 1.0|    2|    3| 1.00| 1.0| 1.00|0      | 1.325204|
+|416 | 1.0|    2|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|417 | 2.5|    0|    0| 1.25| 1.0| 1.33|1      | 1.688553|
+|417 | 2.5|    0|    1| 1.50| 1.1| 1.83|1      | 1.574516|
+|417 | 2.5|    0|    3| 1.42| 1.0| 1.50|1      | 1.617393|
+|417 | 2.5|    0|    4| 1.83| 1.4| 1.67|1      | 1.532414|
+|418 | 2.5|    5|    0| 2.08| 2.5| 1.50|1      | 1.688553|
+|418 | 2.5|    5|    1| 1.08| 1.3| 1.33|1      | 1.574516|
+|418 | 2.5|    5|    3| 2.00| 2.4| 1.67|1      | 1.617393|
+|418 | 2.5|    5|    4| 1.42| 1.8| 1.50|1      | 1.532414|
+|419 | 2.0|    1|    0| 2.00| 1.6| 2.00|0      | 1.482556|
+|419 | 2.0|    1|    1| 2.33| 1.4| 1.83|0      | 1.359807|
+|419 | 2.0|    1|    3| 1.58| 1.4| 1.33|0      | 1.325204|
+|419 | 2.0|    1|    4| 2.75| 2.2| 2.33|0      | 1.365102|
+|420 | 5.0|    3|    0| 1.58| 1.0| 1.00|1      | 1.688553|
+|420 | 5.0|    3|    1| 1.25| 1.4| 1.50|1      | 1.574516|
+|420 | 5.0|    3|    3| 2.08| 1.4| 1.50|1      | 1.617393|
+|420 | 5.0|    3|    4| 1.83| 1.1| 1.17|1      | 1.532414|
+|421 | 2.5|    0|    0| 1.33| 1.1| 1.17|1      | 1.688553|
+|421 | 2.5|    0|    1| 1.33| 1.0| 1.17|1      | 1.574516|
+|421 | 2.5|    0|    3| 1.17| 1.1| 1.17|1      | 1.617393|
+|421 | 2.5|    0|    4| 1.08| 1.1| 1.17|1      | 1.532414|
+|422 | 2.0|    1|    0| 1.25| 1.2| 1.00|0      | 1.482556|
+|422 | 2.0|    1|    1| 1.33| 1.2| 1.00|0      | 1.359807|
+|422 | 2.0|    1|    3| 1.42| 1.1| 1.17|0      | 1.325204|
+|422 | 2.0|    1|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|423 | 1.0|   NA|    0| 1.58| 1.1| 1.17|0      | 1.482556|
+|423 | 1.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|423 | 1.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|423 | 1.0|   NA|    4| 1.00| 1.1| 1.17|0      | 1.365102|
+|424 | 2.5|    0|    0| 1.50| 1.5| 1.50|1      | 1.688553|
+|424 | 2.5|    0|    1| 1.42| 1.9| 1.33|1      | 1.574516|
+|424 | 2.5|    0|    3| 1.50| 1.4| 1.17|1      | 1.617393|
+|424 | 2.5|    0|    4| 1.42| 1.2| 1.17|1      | 1.532414|
+|425 | 1.5|    0|    0| 1.25| 1.4| 1.17|0      | 1.482556|
+|425 | 1.5|    0|    1| 1.33| 1.0| 1.33|0      | 1.359807|
+|425 | 1.5|    0|    3| 1.42| 1.2| 1.33|0      | 1.325204|
+|425 | 1.5|    0|    4|   NA|  NA|   NA|0      | 1.365102|
+|426 | 2.5|    2|    0| 3.92| 3.7| 3.17|1      | 1.688553|
+|426 | 2.5|    2|    1| 1.75| 2.8| 1.83|1      | 1.574516|
+|426 | 2.5|    2|    3| 2.50| 3.1| 1.50|1      | 1.617393|
+|426 | 2.5|    2|    4| 2.83| 3.7| 1.50|1      | 1.532414|
+|427 | 2.5|    5|    0| 1.08| 1.3| 1.17|1      | 1.688553|
+|427 | 2.5|    5|    1| 1.67| 1.5| 1.33|1      | 1.574516|
+|427 | 2.5|    5|    3| 2.25| 1.7| 2.33|1      | 1.617393|
+|427 | 2.5|    5|    4| 2.00| 1.3| 1.17|1      | 1.532414|
+|428 | 2.5|    1|    0| 1.17| 1.2| 1.33|1      | 1.688553|
+|428 | 2.5|    1|    1| 1.33| 1.0| 1.33|1      | 1.574516|
+|428 | 2.5|    1|    3| 1.25| 1.0| 1.33|1      | 1.617393|
+|428 | 2.5|    1|    4| 1.58| 1.4| 1.67|1      | 1.532414|
+|429 | 2.0|    1|    0| 1.42| 1.1| 1.33|0      | 1.482556|
+|429 | 2.0|    1|    1| 1.25| 1.2| 1.33|0      | 1.359807|
+|429 | 2.0|    1|    3| 1.50| 1.1| 1.17|0      | 1.325204|
+|429 | 2.0|    1|    4| 1.33| 1.1| 1.50|0      | 1.365102|
+|430 | 2.5|    2|    0| 1.00| 1.0| 1.17|1      | 1.688553|
+|430 | 2.5|    2|    1| 1.92| 1.0| 1.33|1      | 1.574516|
+|430 | 2.5|    2|    3| 1.58| 1.1| 1.67|1      | 1.617393|
+|430 | 2.5|    2|    4| 1.00| 1.1| 1.50|1      | 1.532414|
+|431 | 1.0|    3|    0| 1.25| 1.1| 1.17|0      | 1.482556|
+|431 | 1.0|    3|    1| 1.08| 1.0| 1.17|0      | 1.359807|
+|431 | 1.0|    3|    3| 2.25| 2.8| 1.17|0      | 1.325204|
+|431 | 1.0|    3|    4| 1.00| 1.0| 1.00|0      | 1.365102|
+|432 | 2.5|    0|    0| 1.17| 1.0| 1.00|1      | 1.688553|
+|432 | 2.5|    0|    1| 1.08| 1.0| 1.17|1      | 1.574516|
+|432 | 2.5|    0|    3| 1.50| 1.0| 1.17|1      | 1.617393|
+|432 | 2.5|    0|    4| 1.25| 1.0| 1.17|1      | 1.532414|
+|433 | 1.0|    2|    0| 1.92| 1.2| 1.33|0      | 1.482556|
+|433 | 1.0|    2|    1| 1.42| 1.3| 1.33|0      | 1.359807|
+|433 | 1.0|    2|    3| 1.42| 1.2| 1.17|0      | 1.325204|
+|433 | 1.0|    2|    4| 1.25| 1.1| 1.00|0      | 1.365102|
+|434 | 3.0|    3|    0| 3.00| 1.7| 2.17|1      | 1.688553|
+|434 | 3.0|    3|    1| 2.58| 1.7| 1.67|1      | 1.574516|
+|434 | 3.0|    3|    3| 3.08| 1.7| 1.67|1      | 1.617393|
+|434 | 3.0|    3|    4| 2.50| 1.4| 1.33|1      | 1.532414|
+|435 | 2.0|   NA|    0| 1.83| 2.0| 1.33|0      | 1.482556|
+|435 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|435 | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|435 | 2.0|   NA|    4| 1.42| 1.2| 1.17|0      | 1.365102|
+|436 | 5.0|    7|    0| 1.25| 1.1| 1.00|1      | 1.688553|
+|436 | 5.0|    7|    1| 1.67| 1.1| 1.00|1      | 1.574516|
+|436 | 5.0|    7|    3| 1.42| 1.1| 1.50|1      | 1.617393|
+|436 | 5.0|    7|    4| 1.08| 1.0| 1.00|1      | 1.532414|
+|437 | 3.0|    1|    0| 2.17| 2.1| 2.50|1      | 1.688553|
+|437 | 3.0|    1|    1| 2.25| 1.8| 1.50|1      | 1.574516|
+|437 | 3.0|    1|    3| 3.00| 2.9| 2.00|1      | 1.617393|
+|437 | 3.0|    1|    4| 1.83| 1.8| 1.33|1      | 1.532414|
+|438 | 3.0|    0|    0| 1.58| 1.6| 1.50|1      | 1.688553|
+|438 | 3.0|    0|    1| 1.33| 1.1| 1.17|1      | 1.574516|
+|438 | 3.0|    0|    3| 1.17| 1.0| 1.00|1      | 1.617393|
+|438 | 3.0|    0|    4| 1.33| 1.0| 1.00|1      | 1.532414|
+|439 | 2.0|   NA|    0| 1.33| 1.1| 1.17|0      | 1.482556|
+|439 | 2.0|   NA|    1|   NA|  NA|   NA|0      | 1.359807|
+|439 | 2.0|   NA|    3|   NA|  NA|   NA|0      | 1.325204|
+|439 | 2.0|   NA|    4|   NA|  NA|   NA|0      | 1.365102|
+|440 | 2.0|    0|    0| 1.58| 1.2| 1.33|0      | 1.482556|
+|440 | 2.0|    0|    1| 2.00| 2.2| 1.50|0      | 1.359807|
+|440 | 2.0|    0|    3| 1.42| 1.4| 1.33|0      | 1.325204|
+|440 | 2.0|    0|    4| 1.50| 1.4| 1.17|0      | 1.365102|
+|441 | 2.0|    0|    0| 3.08| 1.8| 2.17|0      | 1.482556|
+|441 | 2.0|    0|    1| 2.83| 1.7| 1.50|0      | 1.359807|
+|441 | 2.0|    0|    3| 2.67| 1.7| 2.00|0      | 1.325204|
+|441 | 2.0|    0|    4| 2.17| 1.1| 1.33|0      | 1.365102|
+|442 | 3.5|    1|    0| 2.08| 1.5| 1.83|1      | 1.688553|
+|442 | 3.5|    1|    1| 1.83| 1.3| 1.17|1      | 1.574516|
+|442 | 3.5|    1|    3| 1.92| 1.1| 1.67|1      | 1.617393|
+|442 | 3.5|    1|    4| 1.92| 1.2| 2.00|1      | 1.532414|
+|443 | 2.5|    1|    0| 1.33| 1.1| 1.00|1      | 1.688553|
+|443 | 2.5|    1|    1| 1.00| 1.1| 1.00|1      | 1.574516|
+|443 | 2.5|    1|    3| 1.33| 1.1| 1.00|1      | 1.617393|
+|443 | 2.5|    1|    4| 1.33| 1.0| 1.17|1      | 1.532414|
+|444 | 1.0|    1|    0| 1.08| 1.0| 1.17|0      | 1.482556|
+|444 | 1.0|    1|    1| 1.00| 1.0| 1.17|0      | 1.359807|
+|444 | 1.0|    1|    3| 1.08| 1.0| 1.17|0      | 1.325204|
+|444 | 1.0|    1|    4| 1.25| 1.0| 1.17|0      | 1.365102|
+|445 | 3.0|    1|    0| 1.58| 1.3| 1.00|1      | 1.688553|
+|445 | 3.0|    1|    1| 1.33| 1.3| 1.17|1      | 1.574516|
+|445 | 3.0|    1|    3| 1.25| 1.3| 1.17|1      | 1.617393|
+|445 | 3.0|    1|    4| 1.25| 1.3| 1.17|1      | 1.532414|
+|446 | 3.0|    1|    0| 1.33| 1.1| 1.33|1      | 1.688553|
+|446 | 3.0|    1|    1| 1.17| 1.1| 1.17|1      | 1.574516|
+|446 | 3.0|    1|    3| 1.17| 1.1| 1.17|1      | 1.617393|
+|446 | 3.0|    1|    4| 1.33| 1.1| 1.17|1      | 1.532414|
+|447 | 3.0|    1|    0| 3.33| 2.3| 2.00|1      | 1.688553|
+|447 | 3.0|    1|    1| 2.25| 1.7| 1.67|1      | 1.574516|
+|447 | 3.0|    1|    3| 1.67| 1.4| 1.17|1      | 1.617393|
+|447 | 3.0|    1|    4|   NA|  NA|   NA|1      | 1.532414|
+|448 | 3.5|    4|    0| 1.83| 1.3| 2.33|1      | 1.688553|
+|448 | 3.5|    4|    1| 1.50| 1.4| 2.17|1      | 1.574516|
+|448 | 3.5|    4|    3| 1.33| 1.3| 1.50|1      | 1.617393|
+|448 | 3.5|    4|    4| 1.75| 1.5| 1.50|1      | 1.532414|
+|449 | 2.5|    2|    0| 2.00| 1.3| 1.33|1      | 1.688553|
+|449 | 2.5|    2|    1| 1.67| 1.4| 1.67|1      | 1.574516|
+|449 | 2.5|    2|    3| 1.33| 1.2| 1.33|1      | 1.617393|
+|449 | 2.5|    2|    4| 1.67| 1.1| 1.50|1      | 1.532414|
+|450 | 1.0|    0|    0| 1.00| 1.1| 1.17|0      | 1.482556|
+|450 | 1.0|    0|    1| 1.33| 1.2| 1.17|0      | 1.359807|
+|450 | 1.0|    0|    3| 1.25| 1.0| 1.00|0      | 1.325204|
+|450 | 1.0|    0|    4| 1.08| 1.1| 1.00|0      | 1.365102|
+|451 | 2.5|    2|    0| 2.17| 2.2| 2.17|1      | 1.688553|
+|451 | 2.5|    2|    1| 1.67| 2.0| 1.67|1      | 1.574516|
+|451 | 2.5|    2|    3| 1.50| 1.7| 1.50|1      | 1.617393|
+|451 | 2.5|    2|    4| 1.58| 2.0| 1.17|1      | 1.532414|
+]
+
+
+---
+
+
+
+.left-code[
+### Ok - but i just want the means...
+
+```r
+df_dep %&gt;% 
+group_by(time, fc1dik) %&gt;% 
+  mutate(dep_mean = 
+    mean(dep,  
+         na.rm = TRUE)) %&gt;% 
+* ggplot(aes(
+*   x = time,
+*   y = dep_mean
+* )) +
+* geom_point() +
+* geom_line(aes(
+*   colour =fc1dik
+* ))
+```
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label39-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+###Caclulate mean within ggplot
+
+```r
+df_dep %&gt;% 
+  ggplot(aes(
+    x = time,
+    y = dep,
+    colour = fc1dik
+  )) +
+* stat_summary(fun = "mean",
+*              geom ="line") +
+* stat_summary(fun = "mean",
+*              geom ="point")
+```
+
+the **stat_summary** function can be used to calculate a variety of statistics, including means, standard deviations, standard errors etc. ]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label40-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+.left-code[
+### Faceting is great for multilevel models
+
+```r
+*df_dep %&gt;%
+* filter(
+*   id %in% c("1" : "20")) %&gt;%
+* ggplot(aes(
+*   x = time,
+*   y = dep
+* )) +
+* geom_point() +
+* facet_wrap(~id)
+```
+Individual data from 20 respondents.  
+By a quick glance, we see that both intercepts and slopes vary across individuals
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label41-out-1.png" width="100%" /&gt;
+]
+
+
+---
+.left-code[
+### Faceting is great for multilevel models
+
+```r
+df_dep %&gt;% 
+  filter(
+    id %in% c("1" : "20")) %&gt;% 
+  ggplot(aes( 
+    x = time,  
+    y = dep 
+  )) + 
+  facet_wrap(~id) +
+  geom_point(alpha = 0.5) +
+* geom_line(alpha = 0.5) +
+* geom_smooth(method = "lm",
+*             se = FALSE)
+```
+
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label42-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+### Lets fit a multilevel model
+
+```r
+#Formula 
+*mod&lt;- lmer(dep ~ time + I(time^2) + (time|id), data=df_dep)
+
+broom.mixed::tidy(mod) %&gt;% 
+  select(term, estimate, std.error, p.value) %&gt;% 
+  knitr::kable(style = "html")
+```
+
+
+
+|term                  |   estimate| std.error|  p.value|
+|:---------------------|----------:|---------:|--------:|
+|(Intercept)           |  1.5735298| 0.0229688| 0.00e+00|
+|time                  | -0.0955948| 0.0216164| 1.09e-05|
+|I(time^2)             |  0.0172938| 0.0052362| 9.98e-04|
+|sd__(Intercept)       |  0.3819933|        NA|       NA|
+|cor__(Intercept).time | -0.0569563|        NA|       NA|
+|sd__time              |  0.0698107|        NA|       NA|
+|sd__Observation       |  0.3182010|        NA|       NA|
+
+
+---
+### Extracting predicted values of time
+
+```r
+library(ggeffects)
+
+
+
+*pred &lt;- ggpredict(mod, "time [all]")
+
+pred %&gt;% 
+knitr::kable(style = "html")
+```
+
+
+
+|  x| predicted| std.error| conf.low| conf.high|group |
+|--:|---------:|---------:|--------:|---------:|:-----|
+|  0|  1.573530| 0.0229688| 1.528512|  1.618548|1     |
+|  1|  1.495229| 0.0218739| 1.452357|  1.538101|1     |
+|  3|  1.442390| 0.0237395| 1.395861|  1.488918|1     |
+|  4|  1.467852| 0.0268466| 1.415233|  1.520470|1     |
+
+
+**ggpredict** function from the **ggeffects** package is very handy for extracting predicted estimates
+
+see: https://strengejacke.github.io/ggeffects/articles/introduction_randomeffects.html
+
+---
+
+
+.left-code[
+###Lets plot the predicted values
+
+```r
+pred %&gt;% 
+  ggplot(aes(
+    x = x,
+    y = predicted
+  )) +
+  geom_line() +
+* geom_ribbon(
+*   aes(ymin = conf.low,
+*       ymax = conf.high),
+*   alpha = 0.1
+* ) +
+* theme_bw(base_size = 14) +
+* xlab("Time") +
+* ylab("Predicted")
+```
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label43-out-1.png" width="100%" /&gt;
+]
+
+
+
+---
+
+### Getting the interaction
+
+
+```r
+*mod&lt;- lmer(dep ~ time*fc1dik + I(time^2)*fc1dik + (time|id), data=df_dep)
+
+*pred &lt;- ggpredict(mod, c("time [all]", "fc1dik"))
+
+pred %&gt;% knitr::kable(style = "html")
+```
+
+
+
+|  x| predicted| std.error| conf.low| conf.high|group |
+|--:|---------:|---------:|--------:|---------:|:-----|
+|  0|  1.477021| 0.0319052| 1.414487|  1.539554|0     |
+|  0|  1.668054| 0.0315293| 1.606258|  1.729850|1     |
+|  1|  1.371703| 0.0303669| 1.312185|  1.431221|0     |
+|  1|  1.614731| 0.0298308| 1.556263|  1.673198|1     |
+|  3|  1.317818| 0.0330993| 1.252944|  1.382691|0     |
+|  3|  1.562644| 0.0324522| 1.499039|  1.626249|1     |
+|  4|  1.369251| 0.0375832| 1.295589|  1.442913|0     |
+|  4|  1.563881| 0.0369530| 1.491455|  1.636308|1     |
+
+---
+
+.left-code[
+###Plotting predicted values
+
+```r
+pred %&gt;% 
+  ggplot(aes(
+    x = x,
+    y = predicted,
+*   fill = group
+  )) +
+* scale_fill_manual(
+*   values = c("darkred",
+*              "darkblue")) +
+  geom_line() +
+* geom_ribbon(
+*   aes(ymin = conf.low,
+*       ymax = conf.high),
+    alpha = 0.4 #
+  ) + 
+  theme_bw(base_size = 14) + 
+  xlab("Time") + 
+  ylab("Predicted") 
+```
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label44-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+###Regression coefficient plots
+
+```r
+library(gtsummary) 
+
+*mod1 &lt;- lm(lifeExp ~ continent, data = df) %&gt;% tbl_regression()
+*mod2 &lt;- lm(lifeExp ~ continent + log(gdpPercap), data = df)  %&gt;% tbl_regression()
+
+tbl_merge( 
+  tbls = list(mod1, mod2), 
+  tab_spanner = c("**Model 1**", "**Model 2**")) 
+```
+
+<div id="wmahvfxhhy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#wmahvfxhhy .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#wmahvfxhhy .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#wmahvfxhhy .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#wmahvfxhhy .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#wmahvfxhhy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#wmahvfxhhy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#wmahvfxhhy .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#wmahvfxhhy .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#wmahvfxhhy .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#wmahvfxhhy .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#wmahvfxhhy .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#wmahvfxhhy .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#wmahvfxhhy .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#wmahvfxhhy .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#wmahvfxhhy .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#wmahvfxhhy .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#wmahvfxhhy .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#wmahvfxhhy .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#wmahvfxhhy .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#wmahvfxhhy .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#wmahvfxhhy .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#wmahvfxhhy .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#wmahvfxhhy .gt_left {
+  text-align: left;
+}
+
+#wmahvfxhhy .gt_center {
+  text-align: center;
+}
+
+#wmahvfxhhy .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#wmahvfxhhy .gt_font_normal {
+  font-weight: normal;
+}
+
+#wmahvfxhhy .gt_font_bold {
+  font-weight: bold;
+}
+
+#wmahvfxhhy .gt_font_italic {
+  font-style: italic;
+}
+
+#wmahvfxhhy .gt_super {
+  font-size: 65%;
+}
+
+#wmahvfxhhy .gt_two_val_uncert {
+  display: inline-block;
+  line-height: 1em;
+  text-align: right;
+  font-size: 60%;
+  vertical-align: -0.25em;
+  margin-left: 0.1em;
+}
+
+#wmahvfxhhy .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#wmahvfxhhy .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#wmahvfxhhy .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#wmahvfxhhy .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#wmahvfxhhy .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner"><strong>Model 1</strong></span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner"><strong>Model 2</strong></span>
+      </th>
+    </tr>
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>p-value</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">continent</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Africa</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Americas</td>
+<td class="gt_row gt_center">16</td>
+<td class="gt_row gt_center">15, 17</td>
+<td class="gt_row gt_center"><0.001</td>
+<td class="gt_row gt_center">7.0</td>
+<td class="gt_row gt_center">5.9, 8.1</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Asia</td>
+<td class="gt_row gt_center">11</td>
+<td class="gt_row gt_center">10, 12</td>
+<td class="gt_row gt_center"><0.001</td>
+<td class="gt_row gt_center">5.9</td>
+<td class="gt_row gt_center">5.0, 6.8</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Europe</td>
+<td class="gt_row gt_center">23</td>
+<td class="gt_row gt_center">22, 24</td>
+<td class="gt_row gt_center"><0.001</td>
+<td class="gt_row gt_center">9.6</td>
+<td class="gt_row gt_center">8.4, 11</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Oceania</td>
+<td class="gt_row gt_center">25</td>
+<td class="gt_row gt_center">22, 29</td>
+<td class="gt_row gt_center"><0.001</td>
+<td class="gt_row gt_center">9.2</td>
+<td class="gt_row gt_center">6.2, 12</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left">log(gdpPercap)</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center">6.4</td>
+<td class="gt_row gt_center">6.1, 6.8</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="7"><sup class="gt_footnote_marks">1</sup> CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+
+---
+
+
+###Regression coefficient plots
+
+```r
+library(broom) 
+
+*mod1 &lt;- lm(lifeExp ~ continent, data = df)
+
+*mod1_tidy&lt;- broom::tidy(mod1, conf.int = TRUE)  %&gt;%
+* select(term, estimate, conf.low, conf.high)  %&gt;%
+* mutate(model = "Model 1")
+
+knitr::kable(mod1_tidy)
+```
+
+
+
+|term              | estimate| conf.low| conf.high|model   |
+|:-----------------|--------:|--------:|---------:|:-------|
+|(Intercept)       | 48.86533| 48.14046|  49.59020|Model 1 |
+|continentAmericas | 15.79341| 14.52126|  17.06555|Model 1 |
+|continentAsia     | 11.19957| 10.03622|  12.36293|Model 1 |
+|continentEurope   | 23.03836| 21.83994|  24.23677|Model 1 |
+|continentOceania  | 25.46088| 21.69434|  29.22742|Model 1 |
+
+---
+
+
+###Regression coefficient plots
+
+```r
+library(broom) 
+
+*mod2 &lt;- lm(lifeExp ~ continent + log(gdpPercap), data = df)
+
+*mod2_tidy&lt;- broom::tidy(mod2, conf.int = TRUE) %&gt;%
+* select(term, estimate, conf.low, conf.high) %&gt;%
+* mutate(model = "Model 2")
+
+knitr::kable(mod2_tidy)
+```
+
+
+
+|term              | estimate|   conf.low| conf.high|model   |
+|:-----------------|--------:|----------:|---------:|:-------|
+|(Intercept)       | 2.317011| -0.3491743|  4.983196|Model 2 |
+|continentAmericas | 7.014680|  5.9272189|  8.102141|Model 2 |
+|continentAsia     | 5.911714|  4.9766188|  6.846809|Model 2 |
+|continentEurope   | 9.577130|  8.3923605| 10.761899|Model 2 |
+|continentOceania  | 9.213480|  6.2011134| 12.225847|Model 2 |
+|log(gdpPercap)    | 6.421968|  6.0621202|  6.781817|Model 2 |
+
+---
+
+
+
+###Regression coefficient plots
+
+```r
+*coef_df &lt;- rbind(mod1_tidy, mod2_tidy) %&gt;%
+* filter(!term %in% c("(Intercept)"))
+
+knitr::kable(coef_df)
+```
+
+
+
+|term              |  estimate|  conf.low| conf.high|model   |
+|:-----------------|---------:|---------:|---------:|:-------|
+|continentAmericas | 15.793406| 14.521263| 17.065550|Model 1 |
+|continentAsia     | 11.199573| 10.036216| 12.362931|Model 1 |
+|continentEurope   | 23.038356| 21.839942| 24.236770|Model 1 |
+|continentOceania  | 25.460878| 21.694338| 29.227418|Model 1 |
+|continentAmericas |  7.014680|  5.927219|  8.102141|Model 2 |
+|continentAsia     |  5.911714|  4.976619|  6.846809|Model 2 |
+|continentEurope   |  9.577130|  8.392361| 10.761899|Model 2 |
+|continentOceania  |  9.213480|  6.201113| 12.225847|Model 2 |
+|log(gdpPercap)    |  6.421968|  6.062120|  6.781817|Model 2 |
+
+
+---
+
+.left-code[
+###Plotting the coefficients
+
+```r
+coef_df %&gt;% 
+  ggplot(aes(
+    x = estimate,
+    y = term
+  )) +
+* facet_wrap(~model)
+```
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label45-out-1.png" width="100%" /&gt;
+]
+
+
+---
+.left-code[
+###Plotting the coefficients: geom_pointrange()
+
+```r
+coef_df %&gt;% 
+  ggplot(aes(
+    x = estimate,
+    y = term
+  )) +
+  facet_wrap(~model) +
+* geom_pointrange(aes(
+*   xmin = conf.low,
+*   xmax = conf.high
+* ))
+```
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label46-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+
+
+.left-code[
+###Plotting the coefficients: sorting the coefficients
+
+```r
+  coef_df %&gt;% 
+  ggplot(aes(
+    x = estimate,
+    y = term
+  )) +
+  facet_wrap(~model) +
+  geom_pointrange(aes(
+    xmin = conf.low,
+    xmax = conf.high
+  )) +
+* scale_y_discrete(limits=rev)
+```
+We can reorder the y-axis by using the **scale_y_discrete** function
+
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label47-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+###Plotting the coefficients: adding reference line
+
+```r
+coef_df %&gt;% 
+  ggplot(aes(
+    x = estimate,
+    y = term
+  )) +
+  facet_wrap(~model) +
+  geom_pointrange(aes(
+    xmin = conf.low,
+    xmax = conf.high
+  )) +
+  scale_y_discrete(limits=rev) +
+* geom_vline(
+*   xintercept = 0,
+*   linetype = "dashed")
+```
+To add a vertical line, use **geom_vline** (geom_hline for horizontal).
+
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label48-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+
+.left-code[
+###Plotting the coefficients: making pretty
+
+```r
+coef_df %&gt;% 
+  ggplot(aes(
+    x = estimate,
+    y = term
+  )) +
+  facet_wrap(~model) +
+  geom_pointrange(aes(
+    xmin = conf.low,
+    xmax = conf.high
+  )) + 
+  scale_y_discrete(limits=rev) +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed") +
+* theme_bw(base_size = 14) +
+* ylab("") +
+* xlab("Beta")
+```
+
+
+
+]
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label49-out-1.png" width="100%" /&gt;
+]
+
+
+
+---
+### Great extantion packages for ggplot2
+
+.font80[
+| Package | see | 
+|:----:|:--------:|
+| ggstatsplot | &lt;http://ggplot2.tidyverse.org/reference/&gt; |
+| patchwork   | &lt;https://github.com/thomasp85/patchwork#patchwork/&gt; |
+| gganimate   | &lt;https://gganimate.com/&gt; |
+| ggthemes    | &lt;https://github.com/jrnold/ggthemes/&gt; |
+| hrbrthemes  | &lt;https://github.com/hrbrmstr/hrbrthemes/&gt; |
+
+See &lt;https://exts.ggplot2.tidyverse.org/gallery/&gt;  
+]
+
+---
+
+.left-code[
+###ggstatsplot
+
+```r
+*library(ggstatsplot)
+  df %&gt;% 
+    filter(
+      continent %in%
+        c("Americas",
+          "Europe",
+          "Oceania")) %&gt;% 
+* ggbetweenstats(
+* x     = continent,
+* y     = lifeExp,
+* ggtheme = theme_bw())
+```
+ggstatsplot incorporates various statistical tests into the figure. 
+Here we compare life expectancy by three continents
+
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label50-out-1.png" width="100%" /&gt;
+]
+
+
+---
+
+
+
+.left-code[
+###patchwork: combining seperate plots
+
+```r
+*library(patchwork)
+
+plot_1 &lt;- df %&gt;% 
+  ggplot(aes(
+    x = continent,
+    y = lifeExp
+  )) +
+  geom_boxplot() +
+  theme_bw()
+
+
+plot_2 &lt;- df %&gt;% 
+  ggplot(aes(
+    x = year,
+    y = lifeExp
+  )) +
+  geom_smooth(aes(
+    colour = continent)) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+*plot_1 + plot_2
+```
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label51-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+###ggthemes: Additional themes
+
+```r
+*library(ggthemes)
+ df %&gt;% 
+  ggplot(aes(
+    x = continent,
+    y = lifeExp
+  )) +
+  geom_boxplot() +
+* theme_stata()
+```
+
+]
+
+
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label52-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+###gganimate: creating animations
+
+```r
+*library(gganimate)
+g &lt;- gapminder %&gt;%
+  ggplot(aes(x=gdpPercap,
+             y=lifeExp,
+             color=continent,
+             size=pop)) +
+  geom_point(alpha = 0.3,
+             stroke = 0) +
+  scale_x_log10() +
+  labs(x = "GDP",
+       y = "Life Expectancy",
+       color = "") +
+  theme_bw(base_size = 6) +
+  theme(legend.position = "none") +
+  scale_color_brewer(
+    palette = "Dark2") +
+* transition_time(year) +
+* labs(subtitle =
+*        "Year: {frame_time}") +
+* shadow_wake(wake_length = 0.1)
+
+*animate(g, fps = 50, duration = 10,
+*       end_pause = 60, res = 200)
+```
+
+]
+
+.right-plot[
+&lt;img src="Gentle-introduction_files/figure-html/plot-label53-out-1.gif" width="100%" /&gt;
+]
+
+
+
+---
+
+
+###Happy (gg)plotting!
+
+---
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
